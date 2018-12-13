@@ -47,7 +47,7 @@ QUnit.test("TestPrivacyChecker", function(assert) {
     assert.ok(inferredType.datatype === prConfigFactory.DATATYPES.DT_MOBILEPHONE, "Recognizing the value " + value);
     value = "Associazione UNEC - Unione Nazionale Enti Culturali";
     inferredType = datachecker.inferDataTypeOfValue(value);
-    assert.notOk(inferredType.datatype === prConfigFactory.DATATYPES.DT_MOBILEPHONE, "Error: " + value);
+    assert.notOk(inferredType.datatype === prConfigFactory.DATATYPES.DT_MOBILEPHONE, "Recognizing error with the value " + value);
 
     value = "CorSO Emanuele";
     inferredType = datachecker.inferDataTypeOfValue(value);
@@ -64,4 +64,14 @@ QUnit.test("TestPrivacyChecker", function(assert) {
     value = "Via Roma n 424 Interno 2";
     inferredType = datachecker.inferDataTypeOfValue(value);
     assert.ok(inferredType.datatype === prConfigFactory.DATATYPES.DT_ADDRESS, "Recognizing the value " + value);
+
+    value = "amato";
+    inferredType = datachecker.inferDataTypeOfValue(value);
+    assert.ok(inferredType.datatype === prConfigFactory.DATATYPES.DT_SURNAME, "Recognizing the value " + value);
+    value = "barbiero";
+    inferredType = datachecker.inferDataTypeOfValue(value);
+    assert.ok(inferredType.datatype === prConfigFactory.DATATYPES.DT_SURNAME, "Recognizing the value " + value);
+    value = "bartolucci";
+    inferredType = datachecker.inferDataTypeOfValue(value);
+    assert.ok(inferredType.datatype === prConfigFactory.DATATYPES.DT_SURNAME, "Recognizing the value " + value);
 });

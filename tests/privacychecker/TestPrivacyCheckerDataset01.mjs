@@ -37,6 +37,7 @@ function runTests(datum) {
         assert.ok(reportView.DATATYPES["PHONE"].warnings == 16, "Checking of phone numbers");
         //to check
         assert.ok(reportView.DATATYPES["ADDRESS"].warnings == 57, "Checking of addresses");
+        //assert.ok(reportView.DATATYPES["SURNAME"].warnings < 57, "Checking of surnames"); //max_valuae = # of changes; max_value=1->10 surnames, max_value=2->90
 
     });//EndFunction.
 
