@@ -21,5 +21,8 @@
   "homepage": "https://github.com/donpir/JSDataChecker#readme",
   "devDependencies": {
     "qunit": "^2.6.2"
+  },
+  "dependencies": {
+    "file-system": "^2.2.2"
   }
 }

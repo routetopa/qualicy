@@ -23,6 +23,7 @@
 ** A basic configuration for the privacy module.
 **/
 import '../node_modules/fast-levenshtein/levenshtein.js';
+//import '../node_modules/file-system/file-system.js';
 
 const PRDATATYPES = {
     DT_UNKNOWN: { name: "UNKNOWN" },
@@ -32,6 +33,7 @@ const PRDATATYPES = {
     DT_MOBILEPHONE : { name: "MOBILE_PHONE"},
     DT_PHONE : { name: "PHONE"},
     DT_ADDRESS : {name: "ADDRESS"},
+    DT_IBAN : {name:"IBAN"},
 
     DT_SURNAME : {name:"SURNAME"},
     DT_NAME : {name:"NAME"}
@@ -68,7 +70,7 @@ PRDATATYPES.DT_ZIPCODE.evaluate = function(value) {
 };
 
 PRDATATYPES.DT_MOBILEPHONE.evaluate = function(value) {
-    var regex = /^\((([+]|00)39)\)|(([+]|00)39)?\s?((313)|(32[034789])|(33[013456789])|(34[02456789])|(36[0368])|(37[037])|(38[0389])|(39[0123]))[\s-]?([\d]{7})$/;
+    var regex = /^(\((([+]|00)39)\)|(([+]|00)39))?((313)|(32[034789])|(33[013456789])|(34[02456789])|(36[0368])|(37[037])|(38[0389])|(39[0123]))([\d]{7})$/;
 
     value = value.replace(/-/gm, '');
     value = value.replace(/\s/g,'');
@@ -80,7 +82,7 @@ PRDATATYPES.DT_MOBILEPHONE.evaluate = function(value) {
 };
 
 PRDATATYPES.DT_PHONE.evaluate = function(value) {
-    var regex = /^(\((([+]|00)39)\)|(([+]|00)39))?\s?0\d{11}|\d{10}|\d{9}|\d{8}$/;
+    var regex = /^(\((([+]|00)39)\)|(([+]|00)39))?0([\d]{11}|[\d]{10}|[\d]{9}|[\d]{8})$/;
 
     value = value.replace(/-/gm, '');
     value = value.replace(/\s/g,'');
@@ -92,12 +94,23 @@ PRDATATYPES.DT_PHONE.evaluate = function(value) {
 };
 
 PRDATATYPES.DT_ADDRESS.evaluate = function (value) {
-    var regex = /^via|viale|vico|corso|c.so|piazza|piazzetta|p.zza\s([a-z]+\s?)+[,|°]?\d*/i;
+    var regex = /^(via|viale|vico|v[.]|corso|c[.]so|piazza|piazzetta|p[.]|p[.]zza)\s([a-z]+\s?)+[,°]?\d*/i;
 
     value = value.toLowerCase();
 
     if (regex.test(value))
         return { datatype: PRDATATYPES.DT_ADDRESS, value: value };
+
+    return { datatype: PRDATATYPES.DT_UNKNOWN, value: value };
+};
+
+PRDATATYPES.DT_IBAN.evaluate = function (value) {
+    var regex = /^[a-zA-Z]{2}[0-9]{2}[a-zA-Z0-9]{4}[0-9]{7}([a-zA-Z0-9]?){0,16}$/i;
+
+    value = value.replace(/\s/g,'');
+
+    if (regex.test(value))
+        return { datatype: PRDATATYPES.DT_IBAN, value: value };
 
     return { datatype: PRDATATYPES.DT_UNKNOWN, value: value };
 };
@@ -375,6 +388,7 @@ const most_popular_italian_surnames = {
 };
 //const MAX_DISTANCE_SURNAME = 2;
 
+/*
 const most_popular_italian_names = [
     "Francesco",
     "Leonardo",
@@ -451,13 +465,42 @@ const most_popular_italian_names = [
     "Concetta"
 
 ];
+*/
+
+var most_popular_italian_names = {};
+
+/*
+function(){
+    var txtFile = "";
+    var file = new File(["names"], txtFile);
+
+    var names_list = [];
+
+    var reader = new FileReader();
+    debugger
+    reader.onload = function(){
+        var text = reader.result;
+
+        var lines = text.split(/[\r\n]+/g); // tolerate both Windows and Unix linebreaks
+
+        lines.forEach(function(line) {
+            names_list.push(line);
+        });
+
+        return names_list;
+    };
+    reader.readAsText(file);
+};
+*/
 
 PRDATATYPES.DT_SURNAME.evaluate = function (value) {
+
+    var MAX_ACCETTABLE_DISTANCE = value.length/2;
 
     //perfect match
     if (value in most_popular_italian_surnames)
         return { datatype: PRDATATYPES.DT_SURNAME, value: value };
-
+    //debugger
     if (value in most_popular_italian_names)
         return { datatype: PRDATATYPES.DT_NAME, value: value };
 
@@ -471,7 +514,7 @@ PRDATATYPES.DT_SURNAME.evaluate = function (value) {
         }
     }
 
-    var min_distance_name = Levenshtein.get(value, most_popular_italian_names[0]);
+    var min_distance_name = Levenshtein.get(value, most_popular_italian_names[Object.keys(most_popular_italian_names)[0]]);
     for (var key in most_popular_italian_names){
         distance  = Levenshtein.get(value, key);
         if(distance<min_distance_name){
@@ -480,11 +523,11 @@ PRDATATYPES.DT_SURNAME.evaluate = function (value) {
     }
 
     if(min_distance_surname <=min_distance_name){
-        if(min_distance_surname <=(value.length/2)){
+        if(min_distance_surname <=MAX_ACCETTABLE_DISTANCE){
             return { datatype: PRDATATYPES.DT_SURNAME, value: value };
         }
     }else{
-        if(min_distance_name <=(value.length/2)){
+        if(min_distance_name <=MAX_ACCETTABLE_DISTANCE){
             return { datatype: PRDATATYPES.DT_NAME, value: value };
         }
     }
@@ -500,14 +543,230 @@ PRDATATYPES.DT_NAME.evaluate = PRDATATYPES.DT_SURNAME.evaluate;
 
 export class PrivacyConfigFactory {
 
-    constructor() { }//EndConstructor.
+    constructor() {
+        /*
+        var text = file-system.readFileSync("namesList.txt");
+        var textByLine = text.split("\n");
+        textByLine.forEach(function(line) {
+            most_popular_italian_names.push(line);
+        });
+        */
+        var names = "names\n" +
+            "Giulia\n" +
+            "Chiara\n" +
+            "Sara\n" +
+            "Martina\n" +
+            "Francesca\n" +
+            "Silvia\n" +
+            "Elisa\n" +
+            "Alice\n" +
+            "Federica\n" +
+            "Alessia\n" +
+            "Laura\n" +
+            "Elena\n" +
+            "Giorgia\n" +
+            "Valentina\n" +
+            "Eleonora\n" +
+            "Anna\n" +
+            "Marta\n" +
+            "Claudia\n" +
+            "Ilaria\n" +
+            "Sofia\n" +
+            "Arianna\n" +
+            "Beatrice\n" +
+            "Irene\n" +
+            "Roberta\n" +
+            "Michela\n" +
+            "Gaia\n" +
+            "Alessandra\n" +
+            "Valeria\n" +
+            "Giada\n" +
+            "Simona\n" +
+            "Aurora\n" +
+            "Cristina\n" +
+            "Veronica\n" +
+            "Maria\n" +
+            "Rebecca\n" +
+            "Serena\n" +
+            "Noemi\n" +
+            "Benedetta\n" +
+            "Ludovica\n" +
+            "Paola\n" +
+            "Lisa\n" +
+            "Greta\n" +
+            "Camilla\n" +
+            "Elisabetta\n" +
+            "Miriam\n" +
+            "Caterina\n" +
+            "Lucrezia\n" +
+            "Letizia\n" +
+            "Margherita\n" +
+            "Jessica\n" +
+            "Carlotta\n" +
+            "Annalisa\n" +
+            "Daniela\n" +
+            "Lucia\n" +
+            "Barbara\n" +
+            "Linda\n" +
+            "Ginevra\n" +
+            "Cecilia\n" +
+            "Giovanna\n" +
+            "Mary\n" +
+            "Angela\n" +
+            "Sabrina\n" +
+            "Gloria\n" +
+            "Vanessa\n" +
+            "Monica\n" +
+            "Sarah\n" +
+            "Emma\n" +
+            "Matilde\n" +
+            "Viola\n" +
+            "Diana\n" +
+            "Nicole\n" +
+            "Rachele\n" +
+            "Marika\n" +
+            "Emanuela\n" +
+            "Stefania\n" +
+            "Erika\n" +
+            "Debora\n" +
+            "Gabriella\n" +
+            "Antonella\n" +
+            "Angelica\n" +
+            "Rosa\n" +
+            "Luisa\n" +
+            "Giusy\n" +
+            "Teresa\n" +
+            "Ilenia\n" +
+            "Isabella\n" +
+            "Bianca\n" +
+            "Adele\n" +
+            "Manuela\n" +
+            "Julia\n" +
+            "Samantha\n" +
+            "Marina\n" +
+            "Sonia\n" +
+            "Marzia\n" +
+            "Melissa\n" +
+            "Nadia\n" +
+            "Erica\n" +
+            "Gioia\n" +
+            "Anita\n" +
+            "Eva\n" +
+            "Andrea\n" +
+            "Marco\n" +
+            "Francesco\n" +
+            "Luca\n" +
+            "Matteo\n" +
+            "Alessandro\n" +
+            "Davide\n" +
+            "Federico\n" +
+            "Lorenzo\n" +
+            "Stefano\n" +
+            "Giuseppe\n" +
+            "Riccardo\n" +
+            "Daniele\n" +
+            "Simone\n" +
+            "Gabriele\n" +
+            "Antonio\n" +
+            "Mattia\n" +
+            "Christian\n" +
+            "Alberto\n" +
+            "Fabio\n" +
+            "Emanuele\n" +
+            "Giovanni\n" +
+            "Roberto\n" +
+            "Filippo\n" +
+            "Michele\n" +
+            "Edoardo\n" +
+            "Nicola\n" +
+            "Alex\n" +
+            "Giorgio\n" +
+            "Alessio\n" +
+            "Claudio\n" +
+            "Raffaele\n" +
+            "Giacomo\n" +
+            "Leonardo\n" +
+            "Domenico\n" +
+            "Nicolò\n" +
+            "Salvatore\n" +
+            "Gianluca\n" +
+            "Vincenzo\n" +
+            "Luigi\n" +
+            "Mario\n" +
+            "Carlo\n" +
+            "Pietro\n" +
+            "Michael\n" +
+            "Cristian\n" +
+            "Samuele\n" +
+            "Giulio\n" +
+            "Mauro\n" +
+            "Nicholas\n" +
+            "Tommaso\n" +
+            "Paolo\n" +
+            "Ivan\n" +
+            "Leo\n" +
+            "Mirko\n" +
+            "Vito\n" +
+            "Dario\n" +
+            "Manuel\n" +
+            "Enrico\n" +
+            "Thomas\n" +
+            "Kevin\n" +
+            "Cyril\n" +
+            "Angelo\n" +
+            "Jacopo\n" +
+            "Daniel\n" +
+            "Vittorio\n" +
+            "Piero\n" +
+            "Elia\n" +
+            "Rosario\n" +
+            "Carmine\n" +
+            "Samuel\n" +
+            "Guido\n" +
+            "Fabrizio\n" +
+            "Flavio\n" +
+            "Diego\n" +
+            "Gianmarco\n" +
+            "Gabriel\n" +
+            "Max\n" +
+            "Emiliano\n" +
+            "Ale\n" +
+            "Simon\n" +
+            "Maurizio\n" +
+            "Elias\n" +
+            "Tiziano\n" +
+            "Valerio\n" +
+            "Mike\n" +
+            "Pier\n" +
+            "Damiano\n" +
+            "Massimo\n" +
+            "Mark\n" +
+            "Patrick\n" +
+            "Cristiano\n" +
+            "Enzo\n" +
+            "Saverio\n" +
+            "Tom\n" +
+            "Luciano\n" +
+            "Denis\n" +
+            "Umberto\n" +
+            "Sergio\n" +
+            "Martin\n" +
+            "John";
+
+        var lines = names.split(/[\r\n]+/g); // tolerate both Windows and Unix linebreaks
+
+        lines.forEach(function(line) {
+            most_popular_italian_names[line] = "";
+        });
+
+    }//EndConstructor.
 
     get DATATYPES() {
         return PRDATATYPES;
     }
 
     get types() {
-        return [ PRDATATYPES.DT_EMAIL, PRDATATYPES.DT_CF, PRDATATYPES.DT_ZIPCODE, PRDATATYPES.DT_MOBILEPHONE, PRDATATYPES.DT_PHONE, PRDATATYPES.DT_ADDRESS,
+        return [ PRDATATYPES.DT_EMAIL, PRDATATYPES.DT_CF, PRDATATYPES.DT_ZIPCODE, PRDATATYPES.DT_MOBILEPHONE, PRDATATYPES.DT_PHONE, PRDATATYPES.DT_ADDRESS, PRDATATYPES.DT_IBAN,
             PRDATATYPES.DT_SURNAME,
             PRDATATYPES.DT_UNKNOWN];
     }
