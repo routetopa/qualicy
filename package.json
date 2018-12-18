@@ -23,6 +23,6 @@
     "qunit": "^2.6.2"
   },
   "dependencies": {
-    "file-system": "^2.2.2"
+    "fast-levenshtein": "^2.0.6"
   }
 }

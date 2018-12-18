@@ -27,7 +27,7 @@ import '../node_modules/fast-levenshtein/levenshtein.js';
 
 const PRDATATYPES = {
     DT_UNKNOWN: { name: "UNKNOWN" },
-    DT_EMAIL:   { name: "EMAIL" },
+    DT_EMAIL:   { name: "EMAIL", descr: { en: "According to gdpr xxx the e-mail is a sensitive data." } },
     DT_CF:      { name: "CF" },
     DT_ZIPCODE : { name: "ZIPCODE"},
     DT_MOBILEPHONE : { name: "MOBILE_PHONE"},

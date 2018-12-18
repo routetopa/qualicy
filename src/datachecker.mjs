@@ -24,6 +24,8 @@
  **
  **/
 
+import QUALICYLANG from './langs.mjs';
+
 export class DataChecker {
 
     constructor(configFactory) {
@@ -59,9 +61,16 @@ export class DataChecker {
      * The input "metadata" is a json object with:
      *  - an array of columns
      * @param metadata
+     * @param options
      */
-    evaluate(dataset, fieldKeys) {
-        let evaLog = [];
+    evaluate(dataset, fieldKeys, options) {
+        let evaLog = []; //Stack with all the issues found in the dataset.
+        let annotateInputDataset = false;
+
+        //Manage the options.
+        if (typeof options !== "undefined") {
+            annotateInputDataset = (options.annotateInputDataset !== "undefined" && options.annotateInputDataset);
+        }
 
         for (let irow=0; irow<dataset.length; irow++) {
             let row = dataset[irow];
@@ -79,13 +88,26 @@ export class DataChecker {
                 let _inferredType =  this.inferDataTypeOfValue(fieldValue);
 
                 if (_inferredType.datatype !== this._dataTypeConfigFactory.DATATYPES.DT_UNKNOWN) {
-                    evaLog.push({
+                    let _keydescr = "key_descr_" + _inferredType.datatype.name;
+                    let descr = "";
+
+                    if (QUALICYLANG.hasOwnProperty(_keydescr))
+                        descr = QUALICYLANG[_keydescr]["EN"];
+
+                    let evaLogItem = {
                         i: irow,
                         j: ikey,
                         key: key.name,
                         value: fieldValue,
                         datatype: _inferredType.datatype
-                    });
+                    };
+
+                    //The user accepted the annotation of the original dataset.
+                    if (annotateInputDataset) {
+                        row.qualicy = evaLogItem;
+                    }
+
+                    evaLog.push(evaLogItem);
                 }
 
             }//EndFor on keys.

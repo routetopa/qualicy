@@ -6,25 +6,22 @@ import {PrivacyReportViewBuilder} from "../../src/PrivacyReportViewBuilder.mjs";
 Utils.HttpGet("../datasetsprivacy/dataset01.csv").then(runTests);
 
 function runTests(datum) {
+    var reader = new csvjson();
+    var jsonDataset = reader.read(datum); //Parse the CSV Content.
 
-    QUnit.test("TestPrivacyOfDataset01", function (assert) {
-        //Parse the CSV Content.
-        var reader = new csvjson();
-        var jsonDataset = reader.read(datum);
+    QUnit.test("Read and Parse CSV", function (assert) {
         assert.notEqual(jsonDataset, null, "Dataset correctly read.");
         assert.equal(jsonDataset.fields.length, 14, "The dataset has the expected number of columns.");
         assert.equal(jsonDataset.records.length, 57, "The dataset has the expected number of rows.");
+    });
 
-
-
+    QUnit.test("TestPrivacyOfDataset01", function (assert) {
         //Privacy Checker.
         let prConfigFactory = new PrivacyConfigFactory();
         let datachecker = new DataChecker(prConfigFactory);
 
         const records = jsonDataset.records;
         const fieldKeys = jsonDataset.fields;
-
-        debugger
 
         let evaLogs = datachecker.evaluate(jsonDataset.records, fieldKeys);
 
@@ -51,8 +48,21 @@ function runTests(datum) {
         console.log(surnames);
         console.log("names : " + reportView.DATATYPES["NAME"].warnings);
         console.log(names);
-
-
     });//EndFunction.
+
+    QUnit.test("Test Privacy Annotate dataset", function (assert) {
+        //Checking phase.
+        let prConfigFactory = new PrivacyConfigFactory();
+        let datachecker = new DataChecker(prConfigFactory);
+
+        const records = jsonDataset.records;
+        const fieldKeys = jsonDataset.fields;
+
+        let evaLogs = datachecker.evaluate(jsonDataset.records, fieldKeys, { annotateInputDataset: true });
+
+        assert.ok(records[0].hasOwnProperty("qualicy"), "The first cell has signalled with a privacy issue");
+
+        assert.ok(true, "Tutto ok" );
+    });//EndFunction.*/
 
 };//EndTests.

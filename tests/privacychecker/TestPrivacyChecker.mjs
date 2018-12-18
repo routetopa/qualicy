@@ -1,7 +1,7 @@
 import {DataChecker} from "../../src/datachecker.mjs";
 import {PrivacyConfigFactory} from "../../src/PrivacyConfigFactory.mjs";
 
-QUnit.test("TestPrivacyChecker", function(assert) {
+QUnit.test("Test Privacy Checker", function(assert) {
 
     let prConfigFactory = new PrivacyConfigFactory();
     let datachecker = new DataChecker(prConfigFactory);
