@@ -27,7 +27,7 @@ import '../node_modules/fast-levenshtein/levenshtein.js';
 
 const PRDATATYPES = {
     DT_UNKNOWN: { name: "UNKNOWN" },
-    DT_EMAIL:   { name: "EMAIL", descr: { en: "According to gdpr xxx the e-mail is a sensitive data." } },
+    DT_EMAIL:   { name: "EMAIL" },
     DT_CF:      { name: "CF" },
     DT_ZIPCODE : { name: "ZIPCODE"},
     DT_MOBILEPHONE : { name: "MOBILE_PHONE"},
@@ -37,6 +37,12 @@ const PRDATATYPES = {
 
     DT_SURNAME : {name:"SURNAME"},
     DT_NAME : {name:"NAME"}
+};
+
+const PRDATATYPES_LANGS = {
+    "key_descr_email": {
+        "EN": "According to the GDPR the e-mail is a sensitive data."
+    }
 };
 
 //regular expressions
@@ -770,6 +776,18 @@ export class PrivacyConfigFactory {
             PRDATATYPES.DT_SURNAME,
             PRDATATYPES.DT_UNKNOWN];
     }
+
+    /**
+     * Gives the translation for the
+     * @param key
+     * @param lang
+     * @returns {*}
+     */
+    translate(key, lang) {
+        if (PRDATATYPES_LANGS.hasOwnProperty(key))
+            return langs[key][lang];
+        return null;
+    };
 
     /*
      * For the moment it does nothing...

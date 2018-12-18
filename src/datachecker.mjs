@@ -24,8 +24,6 @@
  **
  **/
 
-import QUALICYLANG from './langs.mjs';
-
 export class DataChecker {
 
     constructor(configFactory) {
@@ -89,17 +87,15 @@ export class DataChecker {
 
                 if (_inferredType.datatype !== this._dataTypeConfigFactory.DATATYPES.DT_UNKNOWN) {
                     let _keydescr = "key_descr_" + _inferredType.datatype.name;
-                    let descr = "";
-
-                    if (QUALICYLANG.hasOwnProperty(_keydescr))
-                        descr = QUALICYLANG[_keydescr]["EN"];
+                    let descr = this._dataTypeConfigFactory.translate(_keydescr, "EN");
 
                     let evaLogItem = {
                         i: irow,
                         j: ikey,
                         key: key.name,
                         value: fieldValue,
-                        datatype: _inferredType.datatype
+                        datatype: _inferredType.datatype,
+                        descr: descr
                     };
 
                     //The user accepted the annotation of the original dataset.

@@ -3,7 +3,6 @@
 var fs = require("fs");
 var program = require("commander");
 
-
 var listOfFiles = [
     "src/datachecker.mjs",
     "src/PrivacyConfigFactory.mjs",
@@ -13,9 +12,11 @@ var listOfFiles = [
 
 var fout = "jsprivacychecker.js";
 
-fs.unlinkSync(fout, (err) => {
-    if (err) throw err;
-});
+//Remove the previous one at all file.
+let bFoutExists = fs.existsSync(fout);
+if (bFoutExists) {
+    fs.unlinkSync(fout, (err) => { if (err) throw err; });
+}
 
 //Reading files.
 for (let iFile=0; iFile<listOfFiles.length; iFile++) {
@@ -26,7 +27,7 @@ for (let iFile=0; iFile<listOfFiles.length; iFile++) {
 
         var result = data.replace(/export/g, '') + "\r\n";
 
-        fs.appendFile(fout, result);
+        fs.appendFileSync(fout, result);
 
     });
 }//EndFor.
