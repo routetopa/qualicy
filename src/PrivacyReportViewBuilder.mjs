@@ -32,9 +32,23 @@ export class PrivacyReportViewBuilder {
      */
     build(evaLogs) {
         let reportView = {
-            DATATYPES: {}
+            DATATYPES: {},
+            DATASET: []
         };
 
+        /// It groups the statistics by row.
+        for (let ilog=0; ilog<evaLogs.length; ilog++) {
+            let slog = evaLogs[ilog];
+            let _srowIndex = slog.i + "";
+            let _scolIndex = slog.j + "";
+
+            if (typeof reportView.DATASET[_srowIndex] === 'undefined')
+                reportView.DATASET[_srowIndex] = [];
+
+            reportView.DATASET[_srowIndex][_scolIndex] = slog;
+        }
+
+        /// It groups the statistics by Datatype.
         for (let ilog=0; ilog<evaLogs.length; ilog++) {
             let slog = evaLogs[ilog];
             let sdtkey = slog.datatype.name;

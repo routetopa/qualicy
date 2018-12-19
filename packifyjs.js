@@ -4,6 +4,7 @@ var fs = require("fs");
 var program = require("commander");
 
 var listOfFiles = [
+    "node_modules/fast-levenshtein/levenshtein.js",
     "src/datachecker.mjs",
     "src/PrivacyConfigFactory.mjs",
     "src/PrivacyReportViewBuilder.mjs",

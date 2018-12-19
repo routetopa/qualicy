@@ -1,3 +1,140 @@
+(function() {
+  'use strict';
+  
+  var collator;
+  try {
+    collator = (typeof Intl !== "undefined" && typeof Intl.Collator !== "undefined") ? Intl.Collator("generic", { sensitivity: "base" }) : null;
+  } catch (err){
+    console.log("Collator could not be initialized and wouldn't be used");
+  }
+  // arrays to re-use
+  var prevRow = [],
+    str2Char = [];
+  
+  /**
+   * Based on the algorithm at http://en.wikipedia.org/wiki/Levenshtein_distance.
+   */
+  var Levenshtein = {
+    /**
+     * Calculate levenshtein distance of the two strings.
+     *
+     * @param str1 String the first string.
+     * @param str2 String the second string.
+     * @param [options] Additional options.
+     * @param [options.useCollator] Use `Intl.Collator` for locale-sensitive string comparison.
+     * @return Integer the levenshtein distance (0 and above).
+     */
+    get: function(str1, str2, options) {
+      var useCollator = (options && collator && options.useCollator);
+      
+      var str1Len = str1.length,
+        str2Len = str2.length;
+      
+      // base cases
+      if (str1Len === 0) return str2Len;
+      if (str2Len === 0) return str1Len;
+
+      // two rows
+      var curCol, nextCol, i, j, tmp;
+
+      // initialise previous row
+      for (i=0; i<str2Len; ++i) {
+        prevRow[i] = i;
+        str2Char[i] = str2.charCodeAt(i);
+      }
+      prevRow[str2Len] = str2Len;
+
+      var strCmp;
+      if (useCollator) {
+        // calculate current row distance from previous row using collator
+        for (i = 0; i < str1Len; ++i) {
+          nextCol = i + 1;
+
+          for (j = 0; j < str2Len; ++j) {
+            curCol = nextCol;
+
+            // substution
+            strCmp = 0 === collator.compare(str1.charAt(i), String.fromCharCode(str2Char[j]));
+
+            nextCol = prevRow[j] + (strCmp ? 0 : 1);
+
+            // insertion
+            tmp = curCol + 1;
+            if (nextCol > tmp) {
+              nextCol = tmp;
+            }
+            // deletion
+            tmp = prevRow[j + 1] + 1;
+            if (nextCol > tmp) {
+              nextCol = tmp;
+            }
+
+            // copy current col value into previous (in preparation for next iteration)
+            prevRow[j] = curCol;
+          }
+
+          // copy last col value into previous (in preparation for next iteration)
+          prevRow[j] = nextCol;
+        }
+      }
+      else {
+        // calculate current row distance from previous row without collator
+        for (i = 0; i < str1Len; ++i) {
+          nextCol = i + 1;
+
+          for (j = 0; j < str2Len; ++j) {
+            curCol = nextCol;
+
+            // substution
+            strCmp = str1.charCodeAt(i) === str2Char[j];
+
+            nextCol = prevRow[j] + (strCmp ? 0 : 1);
+
+            // insertion
+            tmp = curCol + 1;
+            if (nextCol > tmp) {
+              nextCol = tmp;
+            }
+            // deletion
+            tmp = prevRow[j + 1] + 1;
+            if (nextCol > tmp) {
+              nextCol = tmp;
+            }
+
+            // copy current col value into previous (in preparation for next iteration)
+            prevRow[j] = curCol;
+          }
+
+          // copy last col value into previous (in preparation for next iteration)
+          prevRow[j] = nextCol;
+        }
+      }
+      return nextCol;
+    }
+
+  };
+
+  // amd
+  if (typeof define !== "undefined" && define !== null && define.amd) {
+    define(function() {
+      return Levenshtein;
+    });
+  }
+  // commonjs
+  else if (typeof module !== "undefined" && module !== null && typeof s !== "undefined" && module.s === s) {
+    module.s = Levenshtein;
+  }
+  // web worker
+  else if (typeof self !== "undefined" && typeof self.postMessage === 'function' && typeof self.importScripts === 'function') {
+    self.Levenshtein = Levenshtein;
+  }
+  // browser main thread
+  else if (typeof window !== "undefined" && window !== null) {
+    window.Levenshtein = Levenshtein;
+  }
+}());
+
+
 /*
  ** This file is part of JSDataChecker.
  **
@@ -100,7 +237,7 @@
 
                     //The user accepted the annotation of the original dataset.
                     if (annotateInputDataset) {
-                        row.qualicy = evaLogItem;
+                        row.__qualicy = evaLogItem;
                     }
 
                     evaLog.push(evaLogItem);
@@ -111,57 +248,6 @@
 
         return evaLog;
     };//EndFunction.
-
-}//EndClass.
-/*
- ** This file is part of JSDataChecker.
- **
- ** JSDataChecker is free software: you can redistribute it and/or modify
- ** it under the terms of the GNU General Public License as published by
- ** the Free Software Foundation, either version 3 of the License, or
- ** (at your option) any later version.
- **
- ** JSDataChecker is distributed in the hope that it will be useful,
- ** but WITHOUT ANY WARRANTY; without even the implied warranty of
- ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- ** GNU General Public License for more details.
- **
- ** You should have received a copy of the GNU General Public License
- ** along with JSDataChecker. If not, see <http://www.gnu.org/licenses/>.
- **
- ** Copyright (C) 2018 JSDataChecker - Donato Pirozzi (donatopirozzi@gmail.com)
- ** Distributed under the GNU GPL v3. For full terms see the file LICENSE.
- ** License: http://www.gnu.org/licenses/gpl.html GPL version 3 or higher
- **
- ** ----------------------------------------------------------------------------------
- **
- ** A basic configuration for the privacy module.
- **/
-
- class PrivacyReportViewBuilder {
-
-    /**
-     * It builds a report in which the statistics are provided
-     * summarised based on DATATYPES
-     * @param evaLogs
-     */
-    build(evaLogs) {
-        let reportView = {
-            DATATYPES: {}
-        };
-
-        for (let ilog=0; ilog<evaLogs.length; ilog++) {
-            let slog = evaLogs[ilog];
-            let sdtkey = slog.datatype.name;
-
-            if (typeof reportView.DATATYPES[sdtkey] === 'undefined')
-                reportView.DATATYPES[sdtkey] = { datatypekey: sdtkey, warnings: 0 };
-
-            reportView.DATATYPES[sdtkey].warnings++;
-        }//EndFor.
-
-        return reportView;
-    }//EndFunction.
 
 }//EndClass.
 /*
@@ -215,6 +301,71 @@
 
 
 /*
+ ** This file is part of JSDataChecker.
+ **
+ ** JSDataChecker is free software: you can redistribute it and/or modify
+ ** it under the terms of the GNU General Public License as published by
+ ** the Free Software Foundation, either version 3 of the License, or
+ ** (at your option) any later version.
+ **
+ ** JSDataChecker is distributed in the hope that it will be useful,
+ ** but WITHOUT ANY WARRANTY; without even the implied warranty of
+ ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ ** GNU General Public License for more details.
+ **
+ ** You should have received a copy of the GNU General Public License
+ ** along with JSDataChecker. If not, see <http://www.gnu.org/licenses/>.
+ **
+ ** Copyright (C) 2018 JSDataChecker - Donato Pirozzi (donatopirozzi@gmail.com)
+ ** Distributed under the GNU GPL v3. For full terms see the file LICENSE.
+ ** License: http://www.gnu.org/licenses/gpl.html GPL version 3 or higher
+ **
+ ** ----------------------------------------------------------------------------------
+ **
+ ** A basic configuration for the privacy module.
+ **/
+
+ class PrivacyReportViewBuilder {
+
+    /**
+     * It builds a report in which the statistics are provided
+     * summarised based on DATATYPES
+     * @param evaLogs
+     */
+    build(evaLogs) {
+        let reportView = {
+            DATATYPES: {},
+            DATASET: []
+        };
+
+        /// It groups the statistics by row.
+        for (let ilog=0; ilog<evaLogs.length; ilog++) {
+            let slog = evaLogs[ilog];
+            let _srowIndex = slog.i + "";
+            let _scolIndex = slog.j + "";
+
+            if (typeof reportView.DATASET[_srowIndex] === 'undefined')
+                reportView.DATASET[_srowIndex] = [];
+
+            reportView.DATASET[_srowIndex][_scolIndex] = slog;
+        }
+
+        /// It groups the statistics by Datatype.
+        for (let ilog=0; ilog<evaLogs.length; ilog++) {
+            let slog = evaLogs[ilog];
+            let sdtkey = slog.datatype.name;
+
+            if (typeof reportView.DATATYPES[sdtkey] === 'undefined')
+                reportView.DATATYPES[sdtkey] = { datatypekey: sdtkey, warnings: 0 };
+
+            reportView.DATATYPES[sdtkey].warnings++;
+        }//EndFor.
+
+        return reportView;
+    }//EndFunction.
+
+}//EndClass.
+/*
 ** This file is part of JSDataChecker.
 **
 ** JSDataChecker is free software: you can redistribute it and/or modify
@@ -238,8 +389,11 @@
 **
 ** A basic configuration for the privacy module.
 **/
-import '../node_modules/fast-levenshtein/levenshtein.js';
-//import '../node_modules/file-system/file-system.js';
+
+//NOTE: do not use import here otherwise it will be difficult to pack
+//the libary in one single file to be used in SPOD.
+//TODO: to be solved how to manage external libraries and dependencies in SPOD cocreation.
+//
 
 const PRDATATYPES = {
     DT_UNKNOWN: { name: "UNKNOWN" },

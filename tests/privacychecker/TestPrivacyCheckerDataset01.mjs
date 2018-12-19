@@ -50,6 +50,22 @@ function runTests(datum) {
         console.log(names);
     });//EndFunction.
 
+    QUnit.test("Test Report View Group by Row", function(assert) {
+        //Privacy Checker.
+        let prConfigFactory = new PrivacyConfigFactory();
+        let datachecker = new DataChecker(prConfigFactory);
+
+        const records = jsonDataset.records;
+        const fieldKeys = jsonDataset.fields;
+
+        let evaLogs = datachecker.evaluate(jsonDataset.records, fieldKeys);
+
+        let viewBuilder = new PrivacyReportViewBuilder();
+        let reportView = viewBuilder.build(evaLogs);
+
+        assert.ok("Indirizzo", reportView.DATASET[0][4].key, "Check the grouping.");
+    });
+
     QUnit.test("Test Privacy Annotate dataset", function (assert) {
         //Checking phase.
         let prConfigFactory = new PrivacyConfigFactory();
@@ -60,8 +76,7 @@ function runTests(datum) {
 
         let evaLogs = datachecker.evaluate(jsonDataset.records, fieldKeys, { annotateInputDataset: true });
 
-        assert.ok(records[0].hasOwnProperty("qualicy"), "The first cell has signalled with a privacy issue");
-
+        assert.ok(records[0].hasOwnProperty("__qualicy"), "The first cell has signalled with a privacy issue");
         assert.ok(true, "Tutto ok" );
     });//EndFunction.*/
 

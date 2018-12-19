@@ -100,7 +100,7 @@ export class DataChecker {
 
                     //The user accepted the annotation of the original dataset.
                     if (annotateInputDataset) {
-                        row.qualicy = evaLogItem;
+                        row.__qualicy = evaLogItem;
                     }
 
                     evaLog.push(evaLogItem);

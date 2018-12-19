@@ -22,8 +22,11 @@
 **
 ** A basic configuration for the privacy module.
 **/
-import '../node_modules/fast-levenshtein/levenshtein.js';
-//import '../node_modules/file-system/file-system.js';
+
+//NOTE: do not use import here otherwise it will be difficult to pack
+//the libary in one single file to be used in SPOD.
+//TODO: to be solved how to manage external libraries and dependencies in SPOD cocreation.
+//
 
 const PRDATATYPES = {
     DT_UNKNOWN: { name: "UNKNOWN" },
