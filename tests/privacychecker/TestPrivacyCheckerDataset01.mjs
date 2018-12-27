@@ -31,23 +31,29 @@ function runTests(datum) {
         assert.ok(reportView.DATATYPES["EMAIL"].warnings == 145, "Checking of emails");
         assert.ok(reportView.DATATYPES["ZIPCODE"].warnings == 57, "Checking of ZIP codes");
         assert.ok(reportView.DATATYPES["MOBILE_PHONE"].warnings == 45, "Checking of mobile phones");
-        assert.ok(reportView.DATATYPES["PHONE"].warnings == 16, "Checking of phone numbers");
+        //assert.ok(reportView.DATATYPES["PHONE"].warnings == 16, "Checking of phone numbers");
         assert.ok(reportView.DATATYPES["ADDRESS"].warnings == 56, "Checking of addresses");
         //assert.ok(reportView.DATATYPES["SURNAME"].warnings < 57, "Checking of surnames"); //max_valuae = # of changes; max_value=1->10 surnames, max_value=2->90
+        assert.ok(reportView.DATATYPES["PROVINCE"].warnings == 70, "Checking of provinces");
+        assert.ok(reportView.DATATYPES["MUNICIPALITY"].warnings == 41, "Checking of municipalities"); //also one surname
 
         var surnames = [];
         var names = [];
+        var other = [];
         for (var index in evaLogs){
             var elem = evaLogs[index];
             if(elem.datatype.name=="SURNAME")
                 surnames.push(elem);
             else if(elem.datatype.name=="NAME")
                 names.push(elem);
+            else if(elem.datatype.name=="MUNICIPALITY")
+                other.push(elem);
         }
         console.log("surnames : " + reportView.DATATYPES["SURNAME"].warnings);
         console.log(surnames);
         console.log("names : " + reportView.DATATYPES["NAME"].warnings);
         console.log(names);
+        console.log(other);
     });//EndFunction.
 
     QUnit.test("Test Report View Group by Row", function(assert) {

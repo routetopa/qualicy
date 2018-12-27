@@ -74,4 +74,43 @@ QUnit.test("Test Privacy Checker", function(assert) {
     value = "bartolucci";
     inferredType = datachecker.inferDataTypeOfValue(value);
     assert.ok(inferredType.datatype === prConfigFactory.DATATYPES.DT_SURNAME, "Recognizing the value " + value);
+
+    value = "salerno";
+    inferredType = datachecker.inferDataTypeOfValue(value);
+    assert.ok(inferredType.datatype === prConfigFactory.DATATYPES.DT_PROVINCE, "Recognizing the value " + value);
+    value = "SALErno";
+    inferredType = datachecker.inferDataTypeOfValue(value);
+    assert.ok(inferredType.datatype === prConfigFactory.DATATYPES.DT_PROVINCE, "Recognizing the value " + value);
+    value = "NA";
+    inferredType = datachecker.inferDataTypeOfValue(value);
+    assert.ok(inferredType.datatype === prConfigFactory.DATATYPES.DT_PROVINCE, "Recognizing the value " + value);
+    value = "na";
+    inferredType = datachecker.inferDataTypeOfValue(value);
+    assert.ok(inferredType.datatype === prConfigFactory.DATATYPES.DT_PROVINCE, "Recognizing the value " + value);
+    value = "np";
+    inferredType = datachecker.inferDataTypeOfValue(value);
+    assert.notOk(inferredType.datatype === prConfigFactory.DATATYPES.DT_PROVINCE, "Recognizing the value " + value);
+
+    value = "maddaloni";
+    inferredType = datachecker.inferDataTypeOfValue(value);
+    assert.ok(inferredType.datatype === prConfigFactory.DATATYPES.DT_MUNICIPALITY, "Recognizing the value " + value);
+    value = "valle di maDDAlonI";
+    inferredType = datachecker.inferDataTypeOfValue(value);
+    assert.ok(inferredType.datatype === prConfigFactory.DATATYPES.DT_MUNICIPALITY, "Recognizing the value " + value);
+    value = "cava de' tirreni";
+    inferredType = datachecker.inferDataTypeOfValue(value);
+    assert.ok(inferredType.datatype === prConfigFactory.DATATYPES.DT_MUNICIPALITY, "Recognizing the value " + value);
+    value = "Montecorvino pugliano";
+    inferredType = datachecker.inferDataTypeOfValue(value);
+    assert.ok(inferredType.datatype === prConfigFactory.DATATYPES.DT_MUNICIPALITY, "Recognizing the value " + value);
+    value = "Ischia";
+    inferredType = datachecker.inferDataTypeOfValue(value);
+    assert.ok(inferredType.datatype === prConfigFactory.DATATYPES.DT_MUNICIPALITY, "Recognizing the value " + value);
+    value = "Montecorvino pugliano ";
+    inferredType = datachecker.inferDataTypeOfValue(value);
+    assert.ok(inferredType.datatype === prConfigFactory.DATATYPES.DT_MUNICIPALITY, "Recognizing the value " + value);
+    value = "Marano di napoli ";
+    inferredType = datachecker.inferDataTypeOfValue(value);
+    assert.ok(inferredType.datatype === prConfigFactory.DATATYPES.DT_MUNICIPALITY, "Recognizing the value " + value);
+
 });
