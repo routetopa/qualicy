@@ -130,6 +130,274 @@ PRDATATYPES.DT_UNKNOWN.evaluate = function (value) {
     return { datatype: PRDATATYPES.DT_UNKNOWN, value: value };
 };
 
+//dictionaries
+const most_popular_italian_surnames = {
+    "Aiello":"",
+    "Amato":"",
+    "Antonini":"",
+    "Arena":"",
+    "Bacci":"",
+    "Baldi":"",
+    "Barberis":"",
+    "Barbero":"",
+    "Barbieri":"",
+    "Bartolini":"",
+    "Basso":"",
+    "Bellucci":"",
+    "Beltrame":"",
+    "Benedetti":"",
+    "Beretta":"",
+    "Bernardi":"",
+    "Berti":"",
+    "Bianchi":"",
+    "Bianco":"",
+    "Bionaz":"",
+    "Blancv":"",
+    "Bordet":"",
+    "Borghi":"",
+    "Bortolin":"",
+    "Bortolotti":"",
+    "Brambilla":"",
+    "Bruno":"",
+    "Bruzzone":"",
+    "Calcagno":"",
+    "Canepa":"",
+    "Capasso":"",
+    "Capriotti":"",
+    "Caputo":"",
+    "Cardinali":"",
+    "Carlucci":"",
+    "Carta":"",
+    "Caruso":"",
+    "Casadei":"",
+    "Castellani":"",
+    "Catalano":"",
+    "Cattaneo":"",
+    "Ceccarelli":"",
+    "Cerise":"",
+    "Cerutti":"",
+    "Chenal":"",
+    "Cocco":"",
+    "Colangelo":"",
+    "Colombo":"",
+    "Colussi":"",
+    "Conte":"",
+    "Conti":"",
+    "Coppola":"",
+    "Corazza":"",
+    "Cossu":"",
+    "Costa":"",
+    "Costantini":"",
+    "Coviello":"",
+    "Cretier":"",
+    "D`Alessandro":"",
+    "D`Amico":"",
+    "D`Angelo":"",
+    "De Angelis":"",
+    "De Luca":"",
+    "De Rosa":"",
+    "De Santis":"",
+    "De Simone":"",
+    "Degano":"",
+    "Deiana":"",
+    "Delfino":"",
+    "Di Carlo":"",
+    "Di Felice":"",
+    "Di Francesco":"",
+    "Di Giacomo":"",
+    "Di Giovanni":"",
+    "Di Iorio":"",
+    "Di Marco":"",
+    "Di Matteo":"",
+    "Di Paolo":"",
+    "Di Pietro":"",
+    "Di Stefano":"",
+    "Diemoz":"",
+    "Donati":"",
+    "Egger":"",
+    "Esposito":"",
+    "Fabbri":"",
+    "Fabbro":"",
+    "Fabris":"",
+    "Fadda":"",
+    "Favre":"",
+    "Ferrando":"",
+    "Ferrara":"",
+    "Ferrari":"",
+    "Ferrario":"",
+    "Ferraris":"",
+    "Ferraro":"",
+    "Ferrero":"",
+    "Ferretti":"",
+    "Ferri":"",
+    "Fiore":"",
+    "Fiorucci":"",
+    "Floris":"",
+    "Fumagalli":"",
+    "Furlan":"",
+    "Fusco":"",
+    "Galli":"",
+    "Gallo":"",
+    "Gamper":"",
+    "Gargiulo":"",
+    "Gasser":"",
+    "Gatti":"",
+    "Gentile":"",
+    "Giannini":"",
+    "Giordano":"",
+    "Giovannini":"",
+    "Giuliani":"",
+    "Giusti":"",
+    "Gori":"",
+    "Grange":"",
+    "Grasso":"",
+    "Greco":"",
+    "Grieco":"",
+    "Grosso":"",
+    "Gruber":"",
+    "Hofer":"",
+    "Iezzi":"",
+    "Innocenti":"",
+    "Izzo":"",
+    "Joly":"",
+    "Kofler":"",
+    "La Rosa":"",
+    "Lai":"",
+    "Landi":"",
+    "Leone":"",
+    "Locatelli":"",
+    "Loi":"",
+    "Lombardi":"",
+    "Lombardo":"",
+    "Longo":"",
+    "Lorusso":"",
+    "Magnani":"",
+    "Mair":"",
+    "Manca":"",
+    "Mancini":"",
+    "Mancuso":"",
+    "Mantovani":"",
+    "Marchetti":"",
+    "Marconi":"",
+    "Mariani":"",
+    "Marinelli":"",
+    "Marini":"",
+    "Marino":"",
+    "Mariotti":"",
+    "Marras":"",
+    "Martin":"",
+    "Martinelli":"",
+    "Martini":"",
+    "Martino":"",
+    "Mauro":"",
+    "Mecca":"",
+    "Melis":"",
+    "Meloni":"",
+    "Messina":"",
+    "Mignogna":"",
+    "Minelli":"",
+    "Moffa":"",
+    "Montanari":"",
+    "Montemurro":"",
+    "Monti":"",
+    "Morabito":"",
+    "Moretti":"",
+    "Moro":"",
+    "Moser":"",
+    "Mura":"",
+    "Murgia":"",
+    "Musso":"",
+    "Napolitano":"",
+    "Negro":"",
+    "Neri":"",
+    "Oliveri":"",
+    "Ottonello":"",
+    "Pace":"",
+    "Pagani":"",
+    "Palladino":"",
+    "Palmisano":"",
+    "Palumbo":"",
+    "Pappalardo":"",
+    "Parisi":"",
+    "Parodi":"",
+    "Passeri":"",
+    "Pastorino":"",
+    "Peaquin":"",
+    "Pedrotti":"",
+    "Pellegrini":"",
+    "Pellissier":"",
+    "Perri":"",
+    "Perron":"",
+    "Perrone":"",
+    "Pession":"",
+    "Pichler":"",
+    "Pinna":"",
+    "Piras":"",
+    "Pircher":"",
+    "Poggi":"",
+    "Porcu":"",
+    "Pozzi":"",
+    "Proietti":"",
+    "Pugliese":"",
+    "Puglisi":"",
+    "Repetto":"",
+    "Ricci":"",
+    "Righi":"",
+    "Rinaldi":"",
+    "Riva":"",
+    "Rizzi":"",
+    "Rizzo":"",
+    "Romagnoli":"",
+    "Romaniello":"",
+    "Romano":"",
+    "Romeo":"",
+    "Rosati":"",
+    "Rosset":"",
+    "Rossi":"",
+    "Rosso":"",
+    "Rota":"",
+    "Ruggiero":"",
+    "Russo":"",
+    "Sabatini":"",
+    "Sabbatini":"",
+    "Sabia":"",
+    "Sala":"",
+    "Salvatore":"",
+    "Sanna":"",
+    "Santarossa":"",
+    "Santarsiero":"",
+    "Santini":"",
+    "Santoro":"",
+    "Sartori":"",
+    "Semeraro":"",
+    "Serra":"",
+    "Simone":"",
+    "Sorrentino":"",
+    "Spina":"",
+    "Talarico":"",
+    "Telesca":"",
+    "Testa":"",
+    "Tomasi":"",
+    "Traverso":"",
+    "Trevisan":"",
+    "Tripodi":"",
+    "Usai":"",
+    "Valentini":"",
+    "Vallet":"",
+    "Venditti":"",
+    "Venier":"",
+    "Venturi":"",
+    "Vierin":"",
+    "Villa":"",
+    "Visintin":"",
+    "Vitale":"",
+    "Vitali":"",
+    "Vuillermoz":"",
+    "Zeni":"",
+    "Zuliani":"",
+    "Zunino":"",
+};
+
 const province = {
     "Campania":["avellino", "benevento", "caserta", "napoli", "salerno"],
 };
@@ -137,7 +405,7 @@ const province_abbreviation = {
     "Campania":["av", "bn", "ce", "na", "sa"],
 };
 
-const town = {
+const municipality = {
     "Campania":["acerno",
         "acerra",
         "afragola",
@@ -690,275 +958,6 @@ const town = {
         "zungoli"],
 };
 
-//dictionaries
-const most_popular_italian_surnames = {
-    "Aiello":"",
-    "Amato":"",
-    "Antonini":"",
-    "Arena":"",
-    "Bacci":"",
-    "Baldi":"",
-    "Barberis":"",
-    "Barbero":"",
-    "Barbieri":"",
-    "Bartolini":"",
-    "Basso":"",
-    "Bellucci":"",
-    "Beltrame":"",
-    "Benedetti":"",
-    "Beretta":"",
-    "Bernardi":"",
-    "Berti":"",
-    "Bianchi":"",
-    "Bianco":"",
-    "Bionaz":"",
-    "Blancv":"",
-    "Bordet":"",
-    "Borghi":"",
-    "Bortolin":"",
-    "Bortolotti":"",
-    "Brambilla":"",
-    "Bruno":"",
-    "Bruzzone":"",
-    "Calcagno":"",
-    "Canepa":"",
-    "Capasso":"",
-    "Capriotti":"",
-    "Caputo":"",
-    "Cardinali":"",
-    "Carlucci":"",
-    "Carta":"",
-    "Caruso":"",
-    "Casadei":"",
-    "Castellani":"",
-    "Catalano":"",
-    "Cattaneo":"",
-    "Ceccarelli":"",
-    "Cerise":"",
-    "Cerutti":"",
-    "Chenal":"",
-    "Cocco":"",
-    "Colangelo":"",
-    "Colombo":"",
-    "Colussi":"",
-    "Conte":"",
-    "Conti":"",
-    "Coppola":"",
-    "Corazza":"",
-    "Cossu":"",
-    "Costa":"",
-    "Costantini":"",
-    "Coviello":"",
-    "Cretier":"",
-    "D`Alessandro":"",
-    "D`Amico":"",
-    "D`Angelo":"",
-    "De Angelis":"",
-    "De Luca":"",
-    "De Rosa":"",
-    "De Santis":"",
-    "De Simone":"",
-    "Degano":"",
-    "Deiana":"",
-    "Delfino":"",
-    "Di Carlo":"",
-    "Di Felice":"",
-    "Di Francesco":"",
-    "Di Giacomo":"",
-    "Di Giovanni":"",
-    "Di Iorio":"",
-    "Di Marco":"",
-    "Di Matteo":"",
-    "Di Paolo":"",
-    "Di Pietro":"",
-    "Di Stefano":"",
-    "Diemoz":"",
-    "Donati":"",
-    "Egger":"",
-    "Esposito":"",
-    "Fabbri":"",
-    "Fabbro":"",
-    "Fabris":"",
-    "Fadda":"",
-    "Favre":"",
-    "Ferrando":"",
-    "Ferrara":"",
-    "Ferrari":"",
-    "Ferrario":"",
-    "Ferraris":"",
-    "Ferraro":"",
-    "Ferrero":"",
-    "Ferretti":"",
-    "Ferri":"",
-    "Fiore":"",
-    "Fiorucci":"",
-    "Floris":"",
-    "Fumagalli":"",
-    "Furlan":"",
-    "Fusco":"",
-    "Galli":"",
-    "Gallo":"",
-    "Gamper":"",
-    "Gargiulo":"",
-    "Gasser":"",
-    "Gatti":"",
-    "Gentile":"",
-    "Giannini":"",
-    "Giordano":"",
-    "Giovannini":"",
-    "Giuliani":"",
-    "Giusti":"",
-    "Gori":"",
-    "Grange":"",
-    "Grasso":"",
-    "Greco":"",
-    "Grieco":"",
-    "Grosso":"",
-    "Gruber":"",
-    "Hofer":"",
-    "Iezzi":"",
-    "Innocenti":"",
-    "Izzo":"",
-    "Joly":"",
-    "Kofler":"",
-    "La Rosa":"",
-    "Lai":"",
-    "Landi":"",
-    "Leone":"",
-    "Locatelli":"",
-    "Loi":"",
-    "Lombardi":"",
-    "Lombardo":"",
-    "Longo":"",
-    "Lorusso":"",
-    "Magnani":"",
-    "Mair":"",
-    "Manca":"",
-    "Mancini":"",
-    "Mancuso":"",
-    "Mantovani":"",
-    "Marchetti":"",
-    "Marconi":"",
-    "Mariani":"",
-    "Marinelli":"",
-    "Marini":"",
-    "Marino":"",
-    "Mariotti":"",
-    "Marras":"",
-    "Martin":"",
-    "Martinelli":"",
-    "Martini":"",
-    "Martino":"",
-    "Mauro":"",
-    "Mecca":"",
-    "Melis":"",
-    "Meloni":"",
-    "Messina":"",
-    "Mignogna":"",
-    "Minelli":"",
-    "Moffa":"",
-    "Montanari":"",
-    "Montemurro":"",
-    "Monti":"",
-    "Morabito":"",
-    "Moretti":"",
-    "Moro":"",
-    "Moser":"",
-    "Mura":"",
-    "Murgia":"",
-    "Musso":"",
-    "Napolitano":"",
-    "Negro":"",
-    "Neri":"",
-    "Oliveri":"",
-    "Ottonello":"",
-    "Pace":"",
-    "Pagani":"",
-    "Palladino":"",
-    "Palmisano":"",
-    "Palumbo":"",
-    "Pappalardo":"",
-    "Parisi":"",
-    "Parodi":"",
-    "Passeri":"",
-    "Pastorino":"",
-    "Peaquin":"",
-    "Pedrotti":"",
-    "Pellegrini":"",
-    "Pellissier":"",
-    "Perri":"",
-    "Perron":"",
-    "Perrone":"",
-    "Pession":"",
-    "Pichler":"",
-    "Pinna":"",
-    "Piras":"",
-    "Pircher":"",
-    "Poggi":"",
-    "Porcu":"",
-    "Pozzi":"",
-    "Proietti":"",
-    "Pugliese":"",
-    "Puglisi":"",
-    "Repetto":"",
-    "Ricci":"",
-    "Righi":"",
-    "Rinaldi":"",
-    "Riva":"",
-    "Rizzi":"",
-    "Rizzo":"",
-    "Romagnoli":"",
-    "Romaniello":"",
-    "Romano":"",
-    "Romeo":"",
-    "Rosati":"",
-    "Rosset":"",
-    "Rossi":"",
-    "Rosso":"",
-    "Rota":"",
-    "Ruggiero":"",
-    "Russo":"",
-    "Sabatini":"",
-    "Sabbatini":"",
-    "Sabia":"",
-    "Sala":"",
-    "Salvatore":"",
-    "Sanna":"",
-    "Santarossa":"",
-    "Santarsiero":"",
-    "Santini":"",
-    "Santoro":"",
-    "Sartori":"",
-    "Semeraro":"",
-    "Serra":"",
-    "Simone":"",
-    "Sorrentino":"",
-    "Spina":"",
-    "Talarico":"",
-    "Telesca":"",
-    "Testa":"",
-    "Tomasi":"",
-    "Traverso":"",
-    "Trevisan":"",
-    "Tripodi":"",
-    "Usai":"",
-    "Valentini":"",
-    "Vallet":"",
-    "Venditti":"",
-    "Venier":"",
-    "Venturi":"",
-    "Vierin":"",
-    "Villa":"",
-    "Visintin":"",
-    "Vitale":"",
-    "Vitali":"",
-    "Vuillermoz":"",
-    "Zeni":"",
-    "Zuliani":"",
-    "Zunino":"",
-};
-//const MAX_DISTANCE_SURNAME = 2;
-
 /*
 const most_popular_italian_names = [
     "Francesco",
@@ -1040,76 +1039,27 @@ const most_popular_italian_names = [
 
 var most_popular_italian_names = {};
 
-
-/*
-function(){
-    var txtFile = "";
-    var file = new File(["names"], txtFile);
-
-    var names_list = [];
-
-    var reader = new FileReader();
-    debugger
-    reader.onload = function(){
-        var text = reader.result;
-
-        var lines = text.split(/[\r\n]+/g); // tolerate both Windows and Unix linebreaks
-
-        lines.forEach(function(line) {
-            names_list.push(line);
-        });
-
-        return names_list;
-    };
-    reader.readAsText(file);
-};
-*/
-
 PRDATATYPES.DT_SURNAME.evaluate = function (value) {
 
     value = value.toLowerCase();
     value = value.trim();
-    var MAX_ACCETTABLE_DISTANCE = value.length/2;
 
-    //perfect match
     if (value in most_popular_italian_surnames)
         return { datatype: PRDATATYPES.DT_SURNAME, value: value };
-    //debugger
-    if (value in most_popular_italian_names)
-        return { datatype: PRDATATYPES.DT_NAME, value: value };
-
-    //similarity distance computed by levenshtein
-    var min_distance_surname = Levenshtein.get(value, most_popular_italian_surnames[Object.keys(most_popular_italian_surnames)[0]]);
-    var distance;
-    for (var key in most_popular_italian_surnames){
-        distance  = Levenshtein.get(value, key);
-        if(distance<min_distance_surname){
-            min_distance_surname = distance;
-        }
-    }
-
-    var min_distance_name = Levenshtein.get(value, most_popular_italian_names[Object.keys(most_popular_italian_names)[0]]);
-    for (var key in most_popular_italian_names){
-        distance  = Levenshtein.get(value, key);
-        if(distance<min_distance_name){
-            min_distance_name = distance;
-        }
-    }
-
-    if(min_distance_surname <=min_distance_name){
-        if(min_distance_surname <=MAX_ACCETTABLE_DISTANCE){
-            return { datatype: PRDATATYPES.DT_SURNAME, value: value };
-        }
-    }else{
-        if(min_distance_name <=MAX_ACCETTABLE_DISTANCE){
-            return { datatype: PRDATATYPES.DT_NAME, value: value };
-        }
-    }
 
     return { datatype: PRDATATYPES.DT_UNKNOWN, value: value };
 };
 
-PRDATATYPES.DT_NAME.evaluate = PRDATATYPES.DT_SURNAME.evaluate;
+PRDATATYPES.DT_NAME.evaluate = function (value) {
+
+    value = value.toLowerCase();
+    value = value.trim();
+
+    if (value in most_popular_italian_names)
+        return { datatype: PRDATATYPES.DT_NAME, value: value };
+
+    return { datatype: PRDATATYPES.DT_UNKNOWN, value: value };
+};
 
 PRDATATYPES.DT_PROVINCE.evaluate = function (value){
     value = value.toLowerCase();
@@ -1132,12 +1082,58 @@ PRDATATYPES.DT_MUNICIPALITY.evaluate = function (value){
     value = value.trim();
 
     //ad hoc for Campania
-    var town_list = town["Campania"];
+    var town_list = municipality["Campania"];
     if(town_list.indexOf(value)>=0)
         return { datatype: PRDATATYPES.DT_MUNICIPALITY, value: value };
 
     return { datatype: PRDATATYPES.DT_UNKNOWN, value: value };
 };
+
+function editDistance1(word) {
+    word = word.toLowerCase().split('');
+    var results = [];
+    var alphabet = "abcdefghijklmnopqrstuvwxyz";
+
+    //Adding any one character (from the alphabet) anywhere in the word.
+    for(var i = 0; i <= word.length; i++){
+        for(var j = 0; j < alphabet.length; j++){
+            var newWord = word.slice();
+            newWord.splice(i, 0, alphabet[j]);
+            results.push(newWord.join(''));
+        }
+    }
+
+    //Removing any one character from the word.
+    if(word.length > 1){
+        for(var i = 0; i < word.length; i++){
+            var newWord = word.slice();
+            newWord.splice(i,1);
+            results.push(newWord.join(''));
+        }
+    }
+
+    //Transposing (switching) the order of any two adjacent characters in a word.
+    if(word.length > 1){
+        for(var i = 0; i < word.length - 1; i++){
+            var newWord = word.slice();
+            var r = newWord.splice(i,1);
+            newWord.splice(i + 1, 0, r[0]);
+            results.push(newWord.join(''));
+        }
+    }
+
+    //Substituting any character in the word with another character.
+    for(var i = 0; i < word.length; i++){
+        for(var j = 0; j < alphabet.length; j++){
+            var newWord = word.slice();
+            newWord[i] = alphabet[j];
+            results.push(newWord.join(''));
+        }
+    }
+
+    return results;
+}
+
 //////////////////////////////////////////////////////////////////////////
 //// The factory class for the configuration of the privacy module.
 ////
@@ -1369,7 +1365,7 @@ export class PrivacyConfigFactory {
     get types() {
         return [ PRDATATYPES.DT_EMAIL, PRDATATYPES.DT_CF, PRDATATYPES.DT_ZIPCODE, PRDATATYPES.DT_MOBILEPHONE, PRDATATYPES.DT_PHONE, PRDATATYPES.DT_ADDRESS, PRDATATYPES.DT_IBAN,
             PRDATATYPES.DT_PROVINCE, PRDATATYPES.DT_MUNICIPALITY,
-            PRDATATYPES.DT_SURNAME,
+            PRDATATYPES.DT_SURNAME, PRDATATYPES.DT_NAME,
             PRDATATYPES.DT_UNKNOWN];
     }
 
@@ -1392,4 +1388,100 @@ export class PrivacyConfigFactory {
         return null;
     };
 
+    correction(value) {
+
+        var editDistance1Words = editDistance1(value);
+
+        var corrections = [];
+        var DATATYPES = [PRDATATYPES.DT_PROVINCE, PRDATATYPES.DT_MUNICIPALITY,
+            PRDATATYPES.DT_SURNAME, PRDATATYPES.DT_NAME];
+
+        for(var i=0; i < editDistance1Words.length; i++){
+            // console.log(editDistance1Words[i])
+            for(var index in DATATYPES){
+                var current_datatype = DATATYPES[index].evaluate(editDistance1Words[i]);
+                if(current_datatype.datatype!=PRDATATYPES.DT_UNKNOWN){
+                    corrections.push({ datatype: current_datatype.datatype, value: value, num_of_modifications:1, correction:editDistance1Words[i]});
+                }
+            }
+        }
+        if(corrections.length==0){
+            correction.push({datatype: PRDATATYPES.DT_UNKNOWN, value: value });
+        }
+        return corrections;
+    };
+
 };//EndClass.
+
+/*
+function(){
+    var txtFile = "";
+    var file = new File(["names"], txtFile);
+
+    var names_list = [];
+
+    var reader = new FileReader();
+    debugger
+    reader.onload = function(){
+        var text = reader.result;
+
+        var lines = text.split(/[\r\n]+/g); // tolerate both Windows and Unix linebreaks
+
+        lines.forEach(function(line) {
+            names_list.push(line);
+        });
+
+        return names_list;
+    };
+    reader.readAsText(file);
+};
+*/
+
+/*
+
+PRDATATYPES.DT_SURNAME.evaluate = function (value) {
+
+    value = value.toLowerCase();
+    value = value.trim();
+    var MAX_ACCETTABLE_DISTANCE = value.length/2;
+
+    //perfect match
+    if (value in most_popular_italian_surnames)
+        return { datatype: PRDATATYPES.DT_SURNAME, value: value };
+    //debugger
+    if (value in most_popular_italian_names)
+        return { datatype: PRDATATYPES.DT_NAME, value: value };
+
+    //similarity distance computed by levenshtein
+    var min_distance_surname = Levenshtein.get(value, most_popular_italian_surnames[Object.keys(most_popular_italian_surnames)[0]]);
+    var distance;
+    for (var key in most_popular_italian_surnames){
+        distance  = Levenshtein.get(value, key);
+        if(distance<min_distance_surname){
+            min_distance_surname = distance;
+        }
+    }
+
+    var min_distance_name = Levenshtein.get(value, most_popular_italian_names[Object.keys(most_popular_italian_names)[0]]);
+    for (var key in most_popular_italian_names){
+        distance  = Levenshtein.get(value, key);
+        if(distance<min_distance_name){
+            min_distance_name = distance;
+        }
+    }
+
+    if(min_distance_surname <=min_distance_name){
+        if(min_distance_surname <=MAX_ACCETTABLE_DISTANCE){
+            return { datatype: PRDATATYPES.DT_SURNAME, value: value };
+        }
+    }else{
+        if(min_distance_name <=MAX_ACCETTABLE_DISTANCE){
+            return { datatype: PRDATATYPES.DT_NAME, value: value };
+        }
+    }
+
+    return { datatype: PRDATATYPES.DT_UNKNOWN, value: value };
+};
+
+PRDATATYPES.DT_NAME.evaluate = PRDATATYPES.DT_SURNAME.evaluate;
+* */

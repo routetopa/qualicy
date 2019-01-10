@@ -112,4 +112,8 @@ export class DataChecker {
         return evaLog;
     };//EndFunction.
 
+    correction(value){
+        return this._dataTypeConfigFactory.correction(value);
+    }
+
 }//EndClass.

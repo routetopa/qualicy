@@ -94,6 +94,7 @@ QUnit.test("Test Privacy Checker", function(assert) {
     inferredType = datachecker.inferDataTypeOfValue(value);
     assert.ok(inferredType.datatype === prConfigFactory.DATATYPES.DT_ADDRESS, "Recognizing the value " + value);
 
+    /*
     value = "amato";
     inferredType = datachecker.inferDataTypeOfValue(value);
     assert.ok(inferredType.datatype === prConfigFactory.DATATYPES.DT_SURNAME, "Recognizing the value " + value);
@@ -103,6 +104,7 @@ QUnit.test("Test Privacy Checker", function(assert) {
     value = "bartolucci";
     inferredType = datachecker.inferDataTypeOfValue(value);
     assert.ok(inferredType.datatype === prConfigFactory.DATATYPES.DT_SURNAME, "Recognizing the value " + value);
+    */
 
     value = "salerno";
     inferredType = datachecker.inferDataTypeOfValue(value);
@@ -142,4 +144,19 @@ QUnit.test("Test Privacy Checker", function(assert) {
     inferredType = datachecker.inferDataTypeOfValue(value);
     assert.ok(inferredType.datatype === prConfigFactory.DATATYPES.DT_MUNICIPALITY, "Recognizing the value " + value);
 
+    value = "Salero";
+    var corrections = datachecker.correction(value);
+    console.log(corrections);
+
+    value = "Saleron";
+    var corrections = datachecker.correction(value);
+    console.log(corrections);
+
+    value = "Salernoo";
+    var corrections = datachecker.correction(value);
+    console.log(corrections);
+
+    value = "Salervo";
+    var corrections = datachecker.correction(value);
+    console.log(corrections);
 });

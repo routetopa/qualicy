@@ -247,7 +247,10 @@
         }//EndFor.
 
         return evaLog;
-    };//EndFunction.
+     };//EndFunction.
+
+
+
 
 }//EndClass.
 /*
@@ -406,7 +409,9 @@ const PRDATATYPES = {
     DT_IBAN : {name:"IBAN"},
 
     DT_SURNAME : {name:"SURNAME"},
-    DT_NAME : {name:"NAME"}
+    DT_NAME : {name:"NAME"},
+    DT_PROVINCE : {name:"PROVINCE"},
+    DT_MUNICIPALITY : {name:"MUNICIPALITY"},
 };
 
 const PRDATATYPES_LANGS = {
@@ -762,7 +767,566 @@ const most_popular_italian_surnames = {
     "Zuliani":"",
     "Zunino":"",
 };
-//const MAX_DISTANCE_SURNAME = 2;
+
+const province = {
+    "Campania":["avellino", "benevento", "caserta", "napoli", "salerno"],
+};
+const province_abbreviation = {
+    "Campania":["av", "bn", "ce", "na", "sa"],
+};
+
+const municipality = {
+    "Campania":["acerno",
+        "acerra",
+        "afragola",
+        "agerola",
+        "agropoli",
+        "aiello del sabato",
+        "ailano",
+        "airola",
+        "albanella",
+        "alfano",
+        "alife",
+        "altavilla irpina",
+        "altavilla silentina",
+        "alvignano",
+        "amalfi",
+        "amorosi",
+        "anacapri",
+        "andretta",
+        "angri",
+        "apice",
+        "apollosa",
+        "aquara",
+        "aquilonia",
+        "ariano irpino",
+        "arienzo",
+        "arpaia",
+        "arpaise",
+        "arzano",
+        "ascea",
+        "atena lucana",
+        "atrani",
+        "atripalda",
+        "auletta",
+        "avella",
+        "avellino",
+        "aversa",
+        "bacoli",
+        "bagnoli irpino",
+        "baia e latina",
+        "baiano",
+        "barano d'ischia",
+        "baronissi",
+        "baselice",
+        "battipaglia",
+        "bellizzi",
+        "bellona",
+        "bellosguardo",
+        "benevento",
+        "bisaccia",
+        "bonea",
+        "bonito",
+        "boscoreale",
+        "boscotrecase",
+        "bracigliano",
+        "brusciano",
+        "bucciano",
+        "buccino",
+        "buonabitacolo",
+        "buonalbergo",
+        "caggiano",
+        "caianello",
+        "caiazzo",
+        "cairano",
+        "caivano",
+        "calabritto",
+        "calitri",
+        "calvanico",
+        "calvi",
+        "calvi risorta",
+        "calvizzano",
+        "camerota",
+        "camigliano",
+        "campagna",
+        "campolattaro",
+        "campoli del monte taburno",
+        "campora",
+        "camposano",
+        "cancello ed arnone",
+        "candida",
+        "cannalonga",
+        "capaccio paestum",
+        "capodrise",
+        "caposele",
+        "capri",
+        "capriati a volturno",
+        "capriglia irpina",
+        "capua",
+        "carbonara di nola",
+        "cardito",
+        "carife",
+        "carinaro",
+        "carinola",
+        "casagiove",
+        "casal di principe",
+        "casal velino",
+        "casalbore",
+        "casalbuono",
+        "casalduni",
+        "casaletto spartano",
+        "casalnuovo di napoli",
+        "casaluce",
+        "casamarciano",
+        "casamicciola terme",
+        "casandrino",
+        "casapesenna",
+        "casapulla",
+        "casavatore",
+        "caselle in pittari",
+        "caserta",
+        "casola di napoli",
+        "casoria",
+        "cassano irpino",
+        "castel baronia",
+        "castel campagnano",
+        "castel di sasso",
+        "castel morrone",
+        "castel san giorgio",
+        "castel san lorenzo",
+        "castel volturno",
+        "castelcivita",
+        "castelfranci",
+        "castelfranco in miscano",
+        "castellabate",
+        "castellammare di stabia",
+        "castello del matese",
+        "castello di cisterna",
+        "castelnuovo cilento",
+        "castelnuovo di conza",
+        "castelpagano",
+        "castelpoto",
+        "castelvenere",
+        "castelvetere in val fortore",
+        "castelvetere sul calore",
+        "castiglione del genovesi",
+        "cautano",
+        "cava de' tirreni",
+        "celle di bulgheria",
+        "cellole",
+        "centola",
+        "ceppaloni",
+        "ceraso",
+        "cercola",
+        "cerreto sannita",
+        "cervinara",
+        "cervino",
+        "cesa",
+        "cesinali",
+        "cetara",
+        "chianche",
+        "chiusano di san domenico",
+        "cicciano",
+        "cicerale",
+        "cimitile",
+        "ciorlano",
+        "circello",
+        "colle sannita",
+        "colliano",
+        "comiziano",
+        "conca dei marini",
+        "conca della campania",
+        "contrada",
+        "controne",
+        "contursi terme",
+        "conza della campania",
+        "corbara",
+        "corleto monforte",
+        "crispano",
+        "cuccaro vetere",
+        "curti",
+        "cusano mutri",
+        "domicella",
+        "dragoni",
+        "dugenta",
+        "durazzano",
+        "eboli",
+        "ercolano",
+        "faicchio",
+        "falciano del massico",
+        "felitto",
+        "fisciano",
+        "flumeri",
+        "foglianise",
+        "foiano di val fortore",
+        "fontanarosa",
+        "fontegreca",
+        "forchia",
+        "forino",
+        "forio",
+        "formicola",
+        "fragneto l'abate",
+        "fragneto monforte",
+        "francolise",
+        "frasso telesino",
+        "frattamaggiore",
+        "frattaminore",
+        "frigento",
+        "frignano",
+        "furore",
+        "futani",
+        "gallo matese",
+        "galluccio",
+        "gesualdo",
+        "giano vetusto",
+        "giffoni sei casali",
+        "giffoni valle piana",
+        "ginestra degli schiavoni",
+        "gioi",
+        "gioia sannitica",
+        "giugliano in campania",
+        "giungano",
+        "gragnano",
+        "grazzanise",
+        "greci",
+        "gricignano di aversa",
+        "grottaminarda",
+        "grottolella",
+        "grumo nevano",
+        "guardia lombardi",
+        "guardia sanframondi",
+        "ischia",
+        "ispani",
+        "lacco ameno",
+        "lacedonia",
+        "lapio",
+        "laureana cilento",
+        "laurino",
+        "laurito",
+        "lauro",
+        "laviano",
+        "letino",
+        "lettere",
+        "liberi",
+        "limatola",
+        "lioni",
+        "liveri",
+        "luogosano",
+        "lusciano",
+        "lustra",
+        "macerata campania",
+        "maddaloni",
+        "magliano vetere",
+        "maiori",
+        "manocalzati",
+        "marano di napoli",
+        "marcianise",
+        "mariglianella",
+        "marigliano",
+        "marzano appio",
+        "marzano di nola",
+        "massa di somma",
+        "massa lubrense",
+        "melito di napoli",
+        "melito irpino",
+        "melizzano",
+        "mercato san severino",
+        "mercogliano",
+        "meta",
+        "mignano monte lungo",
+        "minori",
+        "mirabella eclano",
+        "moiano",
+        "moio della civitella",
+        "molinara",
+        "mondragone",
+        "montaguto",
+        "montano antilia",
+        "monte di procida",
+        "monte san giacomo",
+        "montecalvo irpino",
+        "montecorice",
+        "montecorvino pugliano",
+        "montecorvino rovella",
+        "montefalcione",
+        "montefalcone di val fortore",
+        "monteforte cilento",
+        "monteforte irpino",
+        "montefredane",
+        "montefusco",
+        "montella",
+        "montemarano",
+        "montemiletto",
+        "montesano sulla marcellana",
+        "montesarchio",
+        "monteverde",
+        "montoro",
+        "morcone",
+        "morigerati",
+        "morra de sanctis",
+        "moschiano",
+        "mugnano del cardinale",
+        "mugnano di napoli",
+        "napoli",
+        "nocera inferiore",
+        "nocera superiore",
+        "nola",
+        "novi velia",
+        "nusco",
+        "ogliastro cilento",
+        "olevano sul tusciano",
+        "oliveto citra",
+        "omignano",
+        "orria",
+        "orta di atella",
+        "ospedaletto d'alpinolo",
+        "ottati",
+        "ottaviano",
+        "padula",
+        "paduli",
+        "pagani",
+        "pago del vallo di lauro",
+        "pago veiano",
+        "palma campania",
+        "palomonte",
+        "pannarano",
+        "paolisi",
+        "parete",
+        "parolise",
+        "pastorano",
+        "paternopoli",
+        "paupisi",
+        "pellezzano",
+        "perdifumo",
+        "perito",
+        "pertosa",
+        "pesco sannita",
+        "petina",
+        "petruro irpino",
+        "piaggine",
+        "piana di monte verna",
+        "piano di sorrento",
+        "piedimonte matese",
+        "pietradefusi",
+        "pietramelara",
+        "pietraroja",
+        "pietrastornina",
+        "pietravairano",
+        "pietrelcina",
+        "pignataro maggiore",
+        "pimonte",
+        "pisciotta",
+        "poggiomarino",
+        "polla",
+        "pollena trocchia",
+        "pollica",
+        "pomigliano d'arco",
+        "pompei",
+        "ponte",
+        "pontecagnano faiano",
+        "pontelandolfo",
+        "pontelatone",
+        "portici",
+        "portico di caserta",
+        "positano",
+        "postiglione",
+        "pozzuoli",
+        "praiano",
+        "prata di principato ultra",
+        "prata sannita",
+        "pratella",
+        "pratola serra",
+        "presenzano",
+        "prignano cilento",
+        "procida",
+        "puglianello",
+        "quadrelle",
+        "qualiano",
+        "quarto",
+        "quindici",
+        "ravello",
+        "raviscanina",
+        "recale",
+        "reino",
+        "riardo",
+        "ricigliano",
+        "rocca d'evandro",
+        "rocca san felice",
+        "roccabascerana",
+        "roccadaspide",
+        "roccagloriosa",
+        "roccamonfina",
+        "roccapiemonte",
+        "roccarainola",
+        "roccaromana",
+        "rocchetta e croce",
+        "rofrano",
+        "romagnano al monte",
+        "roscigno",
+        "rotondi",
+        "rutino",
+        "ruviano",
+        "sacco",
+        "sala consilina",
+        "salento",
+        "salerno",
+        "salvitelle",
+        "salza irpina",
+        "san bartolomeo in galdo",
+        "san cipriano d'aversa",
+        "san cipriano picentino",
+        "san felice a cancello",
+        "san gennaro vesuviano",
+        "san giorgio a cremano",
+        "san giorgio del sannio",
+        "san giorgio la molara",
+        "san giovanni a piro",
+        "san giuseppe vesuviano",
+        "san gregorio magno",
+        "san gregorio matese",
+        "san leucio del sannio",
+        "san lorenzello",
+        "san lorenzo maggiore",
+        "san lupo",
+        "san mango piemonte",
+        "san mango sul calore",
+        "san marcellino",
+        "san marco dei cavoti",
+        "san marco evangelista",
+        "san martino sannita",
+        "san martino valle caudina",
+        "san marzano sul sarno",
+        "san mauro cilento",
+        "san mauro la bruca",
+        "san michele di serino",
+        "san nazzaro",
+        "san nicola baronia",
+        "san nicola la strada",
+        "san nicola manfredi",
+        "san paolo bel sito",
+        "san pietro al tanagro",
+        "san pietro infine",
+        "san potito sannitico",
+        "san potito ultra",
+        "san prisco",
+        "san rufo",
+        "san salvatore telesino",
+        "san sebastiano al vesuvio",
+        "san sossio baronia",
+        "san tammaro",
+        "san valentino torio",
+        "san vitaliano",
+        "santa croce del sannio",
+        "santa lucia di serino",
+        "santa maria a vico",
+        "santa maria capua vetere",
+        "santa maria la carità",
+        "santa maria la fossa",
+        "santa marina",
+        "santa paolina",
+        "sant'agata de' goti",
+        "sant'agnello",
+        "sant'anastasia",
+        "sant'andrea di conza",
+        "sant'angelo a cupolo",
+        "sant'angelo a fasanella",
+        "sant'angelo a scala",
+        "sant'angelo all'esca",
+        "sant'angelo d'alife",
+        "sant'angelo dei lombardi",
+        "sant'antimo",
+        "sant'antonio abate",
+        "sant'arcangelo trimonte",
+        "sant'arpino",
+        "sant'arsenio",
+        "sant'egidio del monte albino",
+        "santo stefano del sole",
+        "santomenna",
+        "sanza",
+        "sapri",
+        "sarno",
+        "sassano",
+        "sassinoro",
+        "saviano",
+        "savignano irpino",
+        "scafati",
+        "scala",
+        "scampitella",
+        "scisciano",
+        "senerchia",
+        "serino",
+        "serramezzana",
+        "serrara fontana",
+        "serre",
+        "sessa aurunca",
+        "sessa cilento",
+        "siano",
+        "sicignano degli alburni",
+        "sirignano",
+        "solofra",
+        "solopaca",
+        "somma vesuviana",
+        "sorbo serpico",
+        "sorrento",
+        "sparanise",
+        "sperone",
+        "stella cilento",
+        "stio",
+        "striano",
+        "sturno",
+        "succivo",
+        "summonte",
+        "taurano",
+        "taurasi",
+        "teano",
+        "teggiano",
+        "telese terme",
+        "teora",
+        "terzigno",
+        "teverola",
+        "tocco caudio",
+        "tora e piccilli",
+        "torchiara",
+        "torella dei lombardi",
+        "torraca",
+        "torre annunziata",
+        "torre del greco",
+        "torre le nocelle",
+        "torre orsaia",
+        "torrecuso",
+        "torrioni",
+        "tortorella",
+        "tramonti",
+        "trecase",
+        "trentinara",
+        "trentola-ducenta",
+        "trevico",
+        "tufino",
+        "tufo",
+        "vairano patenora",
+        "vallata",
+        "valle agricola",
+        "valle dell'angelo",
+        "valle di maddaloni",
+        "vallesaccarda",
+        "vallo della lucania",
+        "valva",
+        "venticano",
+        "vibonati",
+        "vico equense",
+        "vietri sul mare",
+        "villa di briano",
+        "villa literno",
+        "villamaina",
+        "villanova del battista",
+        "villaricca",
+        "visciano",
+        "vitulano",
+        "vitulazio",
+        "volla",
+        "volturara irpina",
+        "zungoli"],
+};
 
 /*
 const most_popular_italian_names = [
@@ -845,73 +1409,99 @@ const most_popular_italian_names = [
 
 var most_popular_italian_names = {};
 
-/*
-function(){
-    var txtFile = "";
-    var file = new File(["names"], txtFile);
-
-    var names_list = [];
-
-    var reader = new FileReader();
-    debugger
-    reader.onload = function(){
-        var text = reader.result;
-
-        var lines = text.split(/[\r\n]+/g); // tolerate both Windows and Unix linebreaks
-
-        lines.forEach(function(line) {
-            names_list.push(line);
-        });
-
-        return names_list;
-    };
-    reader.readAsText(file);
-};
-*/
-
 PRDATATYPES.DT_SURNAME.evaluate = function (value) {
 
-    var MAX_ACCETTABLE_DISTANCE = value.length/2;
+    value = value.toLowerCase();
+    value = value.trim();
 
-    //perfect match
     if (value in most_popular_italian_surnames)
         return { datatype: PRDATATYPES.DT_SURNAME, value: value };
-    //debugger
-    if (value in most_popular_italian_names)
-        return { datatype: PRDATATYPES.DT_NAME, value: value };
-
-    //similarity distance computed by levenshtein
-    var min_distance_surname = Levenshtein.get(value, most_popular_italian_surnames[Object.keys(most_popular_italian_surnames)[0]]);
-    var distance;
-    for (var key in most_popular_italian_surnames){
-        distance  = Levenshtein.get(value, key);
-        if(distance<min_distance_surname){
-            min_distance_surname = distance;
-        }
-    }
-
-    var min_distance_name = Levenshtein.get(value, most_popular_italian_names[Object.keys(most_popular_italian_names)[0]]);
-    for (var key in most_popular_italian_names){
-        distance  = Levenshtein.get(value, key);
-        if(distance<min_distance_name){
-            min_distance_name = distance;
-        }
-    }
-
-    if(min_distance_surname <=min_distance_name){
-        if(min_distance_surname <=MAX_ACCETTABLE_DISTANCE){
-            return { datatype: PRDATATYPES.DT_SURNAME, value: value };
-        }
-    }else{
-        if(min_distance_name <=MAX_ACCETTABLE_DISTANCE){
-            return { datatype: PRDATATYPES.DT_NAME, value: value };
-        }
-    }
 
     return { datatype: PRDATATYPES.DT_UNKNOWN, value: value };
 };
 
-PRDATATYPES.DT_NAME.evaluate = PRDATATYPES.DT_SURNAME.evaluate;
+PRDATATYPES.DT_NAME.evaluate = function (value) {
+
+    value = value.toLowerCase();
+    value = value.trim();
+
+    if (value in most_popular_italian_names)
+        return { datatype: PRDATATYPES.DT_NAME, value: value };
+
+    return { datatype: PRDATATYPES.DT_UNKNOWN, value: value };
+};
+
+PRDATATYPES.DT_PROVINCE.evaluate = function (value){
+    value = value.toLowerCase();
+    value = value.trim();
+
+    //ad hoc for Campania
+    var province_list = province["Campania"];
+    if(province_list.indexOf(value)>=0)
+        return { datatype: PRDATATYPES.DT_PROVINCE, value: value };
+
+    var province_abbreviation_list = province_abbreviation["Campania"];
+    if(province_abbreviation_list.indexOf(value)>=0)
+        return { datatype: PRDATATYPES.DT_PROVINCE, value: value };
+
+    return { datatype: PRDATATYPES.DT_UNKNOWN, value: value };
+};
+
+PRDATATYPES.DT_MUNICIPALITY.evaluate = function (value){
+    value = value.toLowerCase();
+    value = value.trim();
+
+    //ad hoc for Campania
+    var town_list = municipality["Campania"];
+    if(town_list.indexOf(value)>=0)
+        return { datatype: PRDATATYPES.DT_MUNICIPALITY, value: value };
+
+    return { datatype: PRDATATYPES.DT_UNKNOWN, value: value };
+};
+
+function editDistance1(word) {
+    word = word.toLowerCase().split('');
+    var results = [];
+
+    //Adding any one character (from the alphabet) anywhere in the word.
+    for(var i = 0; i <= word.length; i++){
+        for(var j = 0; j < alphabet.length; j++){
+            var newWord = word.slice();
+            newWord.splice(i, 0, alphabet[j]);
+            results.push(newWord.join(''));
+        }
+    }
+
+    //Removing any one character from the word.
+    if(word.length > 1){
+        for(var i = 0; i < word.length; i++){
+            var newWord = word.slice();
+            newWord.splice(i,1);
+            results.push(newWord.join(''));
+        }
+    }
+
+    //Transposing (switching) the order of any two adjacent characters in a word.
+    if(word.length > 1){
+        for(var i = 0; i < word.length - 1; i++){
+            var newWord = word.slice();
+            var r = newWord.splice(i,1);
+            newWord.splice(i + 1, 0, r[0]);
+            results.push(newWord.join(''));
+        }
+    }
+
+    //Substituting any character in the word with another character.
+    for(var i = 0; i < word.length; i++){
+        for(var j = 0; j < alphabet.length; j++){
+            var newWord = word.slice();
+            newWord[i] = alphabet[j];
+            results.push(newWord.join(''));
+        }
+    }
+
+    return results;
+}
 
 //////////////////////////////////////////////////////////////////////////
 //// The factory class for the configuration of the privacy module.
@@ -1143,7 +1733,7 @@ PRDATATYPES.DT_NAME.evaluate = PRDATATYPES.DT_SURNAME.evaluate;
 
     get types() {
         return [ PRDATATYPES.DT_EMAIL, PRDATATYPES.DT_CF, PRDATATYPES.DT_ZIPCODE, PRDATATYPES.DT_MOBILEPHONE, PRDATATYPES.DT_PHONE, PRDATATYPES.DT_ADDRESS, PRDATATYPES.DT_IBAN,
-            PRDATATYPES.DT_SURNAME,
+            PRDATATYPES.DT_SURNAME, PRDATATYPES.DT_NAME,
             PRDATATYPES.DT_UNKNOWN];
     }
 
@@ -1165,5 +1755,28 @@ PRDATATYPES.DT_NAME.evaluate = PRDATATYPES.DT_SURNAME.evaluate;
     build() {
         return null;
     };
+
+     correction (value) {
+
+         var editDistance1Words = editDistance1(value);
+
+         var corrections = [];
+         var DATATYPES = [PRDATATYPES.DT_PROVINCE, PRDATATYPES.DT_MUNICIPALITY,
+             PRDATATYPES.DT_SURNAME, PRDATATYPES.DT_NAME];
+
+         for(var i=0; i < editDistance1Words.length; i++){
+             // console.log(editDistance1Words[i])
+             for(var datatype_in_list in DATATYPES){
+                 var current_datatype = datatype_in_list.evaluate(editDistance1Words[i]);
+                 if(current_datatype.datatype!=PRDATATYPES.DT_UNKNOWN){
+                     corrections.push({ datatype: current_datatype.datatype, value: value, num_of_modifications:1, correction:editDistance1Words[i]});
+                 }
+             }
+         }
+         if(corrections.length==0){
+             correction.push({datatype: PRDATATYPES.DT_UNKNOWN, value: value });
+         }
+         return corrections;
+     };
 
 };//EndClass.
