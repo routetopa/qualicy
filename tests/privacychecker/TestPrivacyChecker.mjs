@@ -49,6 +49,35 @@ QUnit.test("Test Privacy Checker", function(assert) {
     inferredType = datachecker.inferDataTypeOfValue(value);
     assert.notOk(inferredType.datatype === prConfigFactory.DATATYPES.DT_MOBILEPHONE, "Recognizing error with the value " + value);
 
+	value = "089 233600";
+    inferredType = datachecker.inferDataTypeOfValue(value);
+    assert.ok(inferredType.datatype === prConfigFactory.DATATYPES.DT_PHONE, "Recognizing the value " + value);
+    value = "0825 594101";
+    inferredType = datachecker.inferDataTypeOfValue(value);
+    assert.ok(inferredType.datatype === prConfigFactory.DATATYPES.DT_PHONE, "Recognizing the value " + value);
+    value = "089 948 2802";
+    inferredType = datachecker.inferDataTypeOfValue(value);
+    assert.ok(inferredType.datatype === prConfigFactory.DATATYPES.DT_PHONE, "Recognizing the value " + value);
+    value = "02 722 2281";
+    inferredType = datachecker.inferDataTypeOfValue(value);
+    assert.ok(inferredType.datatype === prConfigFactory.DATATYPES.DT_PHONE, "Recognizing the value " + value);
+    value = "(+39)02 722 2281";
+    inferredType = datachecker.inferDataTypeOfValue(value);
+    assert.ok(inferredType.datatype === prConfigFactory.DATATYPES.DT_PHONE, "Recognizing the value " + value);
+    value = "+39-02 722 2281";
+    inferredType = datachecker.inferDataTypeOfValue(value);
+    assert.ok(inferredType.datatype === prConfigFactory.DATATYPES.DT_PHONE, "Recognizing the value " + value);
+    value = "0039 02 722 2281";
+    inferredType = datachecker.inferDataTypeOfValue(value);
+    assert.ok(inferredType.datatype === prConfigFactory.DATATYPES.DT_PHONE, "Recognizing the value " + value);
+    value = "+39-02- 722- 2281";
+    inferredType = datachecker.inferDataTypeOfValue(value);
+    assert.ok(inferredType.datatype === prConfigFactory.DATATYPES.DT_PHONE, "Recognizing the value " + value);
+    value = "349 12 34 567";
+    inferredType = datachecker.inferDataTypeOfValue(value);
+    assert.notOk(inferredType.datatype === prConfigFactory.DATATYPES.DT_PHONE, "Recognizing the value " + value);
+
+	
     value = "CorSO Emanuele";
     inferredType = datachecker.inferDataTypeOfValue(value);
     assert.ok(inferredType.datatype === prConfigFactory.DATATYPES.DT_ADDRESS, "Recognizing the value " + value);
