@@ -187,6 +187,7 @@ export class BasicDataTypeConfigFactory {
         return dtds.traverseDepthFirst();
     };
 
+
     build() {
         const dt_text = new TDSNODE(DATATYPES.DT_TEXT);
 
@@ -207,6 +208,17 @@ export class BasicDataTypeConfigFactory {
         const dt_object = new TDSNODE(DATATYPES.DT_OBJECT, dt_text);
 
         return new TDS(dt_text);
+    };
+
+    testTyposErrors(value) {
+
+        var corrections = [];
+        return corrections;
+    };
+
+    testContentPrivacyBreaches(value){
+        var matchList = [];
+        return matchList;
     };
 
 };//EndClass.

@@ -112,8 +112,12 @@ export class DataChecker {
         return evaLog;
     };//EndFunction.
 
-    correction(value){
-        return this._dataTypeConfigFactory.correction(value);
+    testTyposErrors(value){
+        return this._dataTypeConfigFactory.testTyposErrors(value);
+    }
+
+    testContentPrivacyBreaches(value){
+        return this._dataTypeConfigFactory.testContentPrivacyBreaches(value);
     }
 
 }//EndClass.

@@ -131,6 +131,54 @@ PRDATATYPES.DT_UNKNOWN.evaluate = function (value) {
 };
 
 //dictionaries
+PRDATATYPES.DT_SURNAME.evaluate = function (value) {
+
+    //value = value.toLowerCase();
+    value = value.trim();
+
+    debugger
+    if (value in most_popular_italian_surnames)
+        return { datatype: PRDATATYPES.DT_SURNAME, value: value };
+
+    return { datatype: PRDATATYPES.DT_UNKNOWN, value: value };
+};
+
+PRDATATYPES.DT_NAME.evaluate = function (value) {
+
+    //value = value.toLowerCase();
+    value = value.trim();
+
+    debugger
+    if (value in most_popular_italian_names)
+        return { datatype: PRDATATYPES.DT_NAME, value: value };
+
+    return { datatype: PRDATATYPES.DT_UNKNOWN, value: value };
+};
+
+PRDATATYPES.DT_PROVINCE.evaluate = function (value){
+    value = value.replace(/\s+/g, ' ').trim();
+    value = value.toLowerCase();
+
+    if(value in province)
+        return { datatype: PRDATATYPES.DT_PROVINCE, value: value };
+
+    if(value in province_abbreviation)
+        return { datatype: PRDATATYPES.DT_PROVINCE, value: value };
+
+    return { datatype: PRDATATYPES.DT_UNKNOWN, value: value };
+};
+
+PRDATATYPES.DT_MUNICIPALITY.evaluate = function (value){
+    value = value.replace(/\s+/g, ' ').trim();
+    value = value.toLowerCase();
+
+    var town_list = municipality["Campania"];
+    if(town_list.indexOf(value)>=0)
+        return { datatype: PRDATATYPES.DT_MUNICIPALITY, value: value };
+
+    return { datatype: PRDATATYPES.DT_UNKNOWN, value: value };
+};
+
 const most_popular_italian_surnames = {
     "Aiello":"",
     "Amato":"",
@@ -399,10 +447,18 @@ const most_popular_italian_surnames = {
 };
 
 const province = {
-    "Campania":["avellino", "benevento", "caserta", "napoli", "salerno"],
+    "avellino" : "Campania",
+    "benevento" : "Campania",
+    "caserta" : "Campania",
+    "napoli" : "Campania",
+    "salerno" : "Campania"
 };
 const province_abbreviation = {
-    "Campania":["av", "bn", "ce", "na", "sa"],
+    "av" : "Campania",
+    "bn" : "Campania",
+    "ce" : "Campania",
+    "na" : "Campania",
+    "sa" : "Campania"
 };
 
 const municipality = {
@@ -1039,59 +1095,79 @@ const most_popular_italian_names = [
 
 var most_popular_italian_names = {};
 
-PRDATATYPES.DT_SURNAME.evaluate = function (value) {
 
-    value = value.toLowerCase();
-    value = value.trim();
+PRDATATYPES.DT_PROVINCE.correct = function (words, value) {
+    var corrections = [];
 
-    if (value in most_popular_italian_surnames)
-        return { datatype: PRDATATYPES.DT_SURNAME, value: value };
-
-    return { datatype: PRDATATYPES.DT_UNKNOWN, value: value };
+    for(var key in words){
+        var current_datatype = PRDATATYPES.DT_PROVINCE.evaluate(key);
+        if(current_datatype.datatype!=PRDATATYPES.DT_UNKNOWN) {
+            corrections.push({
+                datatype: PRDATATYPES.DT_PROVINCE,
+                value: value,
+                num_of_modifications: words[key],
+                correction: key
+            });
+        }
+    }
+    return corrections;
 };
 
-PRDATATYPES.DT_NAME.evaluate = function (value) {
+PRDATATYPES.DT_MUNICIPALITY.correct = function (words, value) {
+    var corrections = [];
 
-    value = value.toLowerCase();
-    value = value.trim();
+    for(var key in words){
+        var current_datatype = PRDATATYPES.DT_MUNICIPALITY.evaluate(key);
+        if(current_datatype.datatype!=PRDATATYPES.DT_UNKNOWN) {
+            corrections.push({
+                datatype: PRDATATYPES.DT_MUNICIPALITY,
+                value: value,
+                num_of_modifications: words[key],
+                correction: key
+            });
+        }
+    }
 
-    if (value in most_popular_italian_names)
-        return { datatype: PRDATATYPES.DT_NAME, value: value };
-
-    return { datatype: PRDATATYPES.DT_UNKNOWN, value: value };
+    return corrections;
 };
 
-PRDATATYPES.DT_PROVINCE.evaluate = function (value){
-    value = value.toLowerCase();
-    value = value.trim();
+PRDATATYPES.DT_SURNAME.correct = function (words, value) {
+    var corrections = [];
 
-    //ad hoc for Campania
-    var province_list = province["Campania"];
-    if(province_list.indexOf(value)>=0)
-        return { datatype: PRDATATYPES.DT_PROVINCE, value: value };
-
-    var province_abbreviation_list = province_abbreviation["Campania"];
-    if(province_abbreviation_list.indexOf(value)>=0)
-        return { datatype: PRDATATYPES.DT_PROVINCE, value: value };
-
-    return { datatype: PRDATATYPES.DT_UNKNOWN, value: value };
+    for(var key in words){
+        var current_datatype = PRDATATYPES.DT_SURNAME.evaluate(key);
+        if(current_datatype.datatype!=PRDATATYPES.DT_UNKNOWN) {
+            corrections.push({
+                datatype: PRDATATYPES.DT_SURNAME,
+                value: value,
+                num_of_modifications: words[key],
+                correction: key
+            });
+        }
+    }
+    return corrections;
 };
 
-PRDATATYPES.DT_MUNICIPALITY.evaluate = function (value){
-    value = value.toLowerCase();
-    value = value.trim();
+PRDATATYPES.DT_NAME.correct = function (words, value) {
+    var corrections = [];
 
-    //ad hoc for Campania
-    var town_list = municipality["Campania"];
-    if(town_list.indexOf(value)>=0)
-        return { datatype: PRDATATYPES.DT_MUNICIPALITY, value: value };
-
-    return { datatype: PRDATATYPES.DT_UNKNOWN, value: value };
+    for(var key in words){
+        var current_datatype = PRDATATYPES.DT_NAME.evaluate(key);
+        if(current_datatype.datatype!=PRDATATYPES.DT_UNKNOWN) {
+            corrections.push({
+                datatype: PRDATATYPES.DT_NAME,
+                value: value,
+                num_of_modifications: words[key],
+                correction: key
+            });
+        }
+    }
+    return corrections;
 };
 
 function editDistance1(word) {
     word = word.toLowerCase().split('');
-    var results = [];
+    var results = {};
     var alphabet = "abcdefghijklmnopqrstuvwxyz";
 
     //Adding any one character (from the alphabet) anywhere in the word.
@@ -1099,7 +1175,8 @@ function editDistance1(word) {
         for(var j = 0; j < alphabet.length; j++){
             var newWord = word.slice();
             newWord.splice(i, 0, alphabet[j]);
-            results.push(newWord.join(''));
+            newWord = newWord.join('');
+            results[newWord] = 1;
         }
     }
 
@@ -1108,7 +1185,8 @@ function editDistance1(word) {
         for(var i = 0; i < word.length; i++){
             var newWord = word.slice();
             newWord.splice(i,1);
-            results.push(newWord.join(''));
+            newWord = newWord.join('');
+            results[newWord] = 1;
         }
     }
 
@@ -1118,7 +1196,8 @@ function editDistance1(word) {
             var newWord = word.slice();
             var r = newWord.splice(i,1);
             newWord.splice(i + 1, 0, r[0]);
-            results.push(newWord.join(''));
+            newWord = newWord.join('');
+            results[newWord] = 1;
         }
     }
 
@@ -1127,12 +1206,122 @@ function editDistance1(word) {
         for(var j = 0; j < alphabet.length; j++){
             var newWord = word.slice();
             newWord[i] = alphabet[j];
-            results.push(newWord.join(''));
+            newWord = newWord.join('');
+            results[newWord] = 1;
         }
     }
 
     return results;
 }
+
+
+
+PRDATATYPES.DT_CF.checkInText = function (value) {
+    var regex = /(?:(?:[B-DF-HJ-NP-TV-Z]|[AEIOU])[AEIOU][AEIOUX]|[B-DF-HJ-NP-TV-Z]{2}[A-Z]){2}[\dLMNP-V]{2}(?:[A-EHLMPR-T](?:[04LQ][1-9MNP-V]|[1256LMRS][\dLMNP-V])|[DHPS][37PT][0L]|[ACELMRT][37PT][01LM])(?:[A-MZ][1-9MNP-V][\dLMNP-V]{2}|[A-M][0L](?:[1-9MNP-V][\dLMNP-V]|[0L][1-9MNP-V]))[A-Z]/ig;
+
+    value = value.toLowerCase();
+    var matchList = [];
+    var match = regex.exec(value);
+    while (match != null) {
+        matchList.push({ datatype: PRDATATYPES.DT_CF, value: value, match:match[0]});
+        match = regex.exec(value);
+    }
+
+    return matchList;
+};
+
+PRDATATYPES.DT_EMAIL.checkInText = function (value) {
+    var regex = /(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))/g;
+
+    value = value.toLowerCase();
+    var matchList = [];
+    var match = regex.exec(value);
+    while (match != null) {
+        matchList.push({ datatype: PRDATATYPES.DT_EMAIL, value: value, match:match[0]});
+        match = regex.exec(value);
+    }
+
+    return matchList;
+};
+
+PRDATATYPES.DT_ZIPCODE.checkInText = function(value) {
+    var regex = /([0-9]{5})/g;
+
+    //value = value.toLowerCase();
+    var matchList = [];
+    var match = regex.exec(value);
+    while (match != null) {
+        matchList.push({ datatype: PRDATATYPES.DT_ZIPCODE, value: value, match:match[0]});
+        match = regex.exec(value);
+    }
+
+    return matchList;
+};
+
+PRDATATYPES.DT_MOBILEPHONE.checkInText = function(value)  {
+    var regex = /(\((([+]|00)39)\)|(([+]|00)39))?((313)|(32[034789])|(33[013456789])|(34[02456789])|(36[0368])|(37[037])|(38[0389])|(39[0123]))([\d]{7})/g;
+
+    value = value.replace(/-/gm, '');
+    value = value.replace(/\s/g,'');
+
+    //value = value.toLowerCase();
+    var matchList = [];
+    var match = regex.exec(value);
+    while (match != null) {
+        matchList.push({ datatype: PRDATATYPES.DT_MOBILEPHONE, value: value, match:match[0]});
+        match = regex.exec(value);
+    }
+
+    return matchList;
+};
+
+PRDATATYPES.DT_PHONE.checkInText = function(value) {
+    var regex = /(\((([+]|00)39)\)|(([+]|00)39))?0([\d]{11}|[\d]{10}|[\d]{9}|[\d]{8})/g;
+
+    value = value.replace(/-/gm, '');
+    value = value.replace(/\s/g,'');
+
+    //value = value.toLowerCase();
+    var matchList = [];
+    var match = regex.exec(value);
+    while (match != null) {
+        matchList.push({ datatype: PRDATATYPES.DT_PHONE, value: value, match:match[0]});
+        match = regex.exec(value);
+    }
+
+    return matchList;
+};
+
+PRDATATYPES.DT_ADDRESS.checkInText = function (value) {
+    var regex = /(via|viale|vico|v[.]|corso|c[.]so|piazza|piazzetta|p[.]|p[.]zza)\s([a-z]+\s?)+([,°][ ]?)?\d*/ig;
+
+    value = value.toLowerCase();
+
+    var matchList = [];
+    var match = regex.exec(value);
+    while (match != null) {
+        matchList.push({ datatype: PRDATATYPES.DT_ADDRESS, value: value, match:match[0]});
+        match = regex.exec(value);
+    }
+
+    return matchList;
+};
+
+PRDATATYPES.DT_IBAN.checkInText = function (value) {
+    var regex = /[a-zA-Z]{2}[0-9]{2}[a-zA-Z0-9]{4}[0-9]{7}([a-zA-Z0-9]?){0,16}/ig;
+
+    value = value.replace(/\s/g,'');
+
+    var matchList = [];
+    var match = regex.exec(value);
+    while (match != null) {
+        matchList.push({ datatype: PRDATATYPES.DT_IBAN, value: value, match:match[0]});
+        match = regex.exec(value);
+    }
+
+    return matchList;
+};
+
 
 //////////////////////////////////////////////////////////////////////////
 //// The factory class for the configuration of the privacy module.
@@ -1363,10 +1552,19 @@ export class PrivacyConfigFactory {
     }
 
     get types() {
-        return [ PRDATATYPES.DT_EMAIL, PRDATATYPES.DT_CF, PRDATATYPES.DT_ZIPCODE, PRDATATYPES.DT_MOBILEPHONE, PRDATATYPES.DT_PHONE, PRDATATYPES.DT_ADDRESS, PRDATATYPES.DT_IBAN,
+        return [PRDATATYPES.DT_EMAIL, PRDATATYPES.DT_CF, PRDATATYPES.DT_ZIPCODE, PRDATATYPES.DT_MOBILEPHONE, PRDATATYPES.DT_PHONE, PRDATATYPES.DT_ADDRESS, PRDATATYPES.DT_IBAN,
             PRDATATYPES.DT_PROVINCE, PRDATATYPES.DT_MUNICIPALITY,
             PRDATATYPES.DT_SURNAME, PRDATATYPES.DT_NAME,
             PRDATATYPES.DT_UNKNOWN];
+    }
+
+    get typosCheckingTypes() {
+        return [PRDATATYPES.DT_PROVINCE, PRDATATYPES.DT_MUNICIPALITY,
+            PRDATATYPES.DT_SURNAME, PRDATATYPES.DT_NAME];
+    }
+
+    get contentPrivacyBreachesTypes() {
+        return [PRDATATYPES.DT_EMAIL, PRDATATYPES.DT_CF, PRDATATYPES.DT_IBAN, PRDATATYPES.DT_ZIPCODE, PRDATATYPES.DT_MOBILEPHONE, PRDATATYPES.DT_PHONE, PRDATATYPES.DT_ADDRESS];
     }
 
     /**
@@ -1388,28 +1586,30 @@ export class PrivacyConfigFactory {
         return null;
     };
 
-    correction(value) {
-
+    testTyposErrors(value) {
         var editDistance1Words = editDistance1(value);
 
         var corrections = [];
-        var DATATYPES = [PRDATATYPES.DT_PROVINCE, PRDATATYPES.DT_MUNICIPALITY,
-            PRDATATYPES.DT_SURNAME, PRDATATYPES.DT_NAME];
+        var testCorrectionDatatypes = this.typosCheckingTypes;
 
-        for(var i=0; i < editDistance1Words.length; i++){
-            // console.log(editDistance1Words[i])
-            for(var index in DATATYPES){
-                var current_datatype = DATATYPES[index].evaluate(editDistance1Words[i]);
-                if(current_datatype.datatype!=PRDATATYPES.DT_UNKNOWN){
-                    corrections.push({ datatype: current_datatype.datatype, value: value, num_of_modifications:1, correction:editDistance1Words[i]});
-                }
-            }
+        for(var index in testCorrectionDatatypes){
+            corrections = corrections.concat(testCorrectionDatatypes[index].correct(editDistance1Words, value));
         }
-        if(corrections.length==0){
-            correction.push({datatype: PRDATATYPES.DT_UNKNOWN, value: value });
-        }
+
         return corrections;
     };
+
+    testContentPrivacyBreaches(value){
+        var matchList = [];
+        var contentPrivacyBreachesDatatypes = this.contentPrivacyBreachesTypes;
+
+        for(var index in contentPrivacyBreachesDatatypes){
+            matchList = matchList.concat(contentPrivacyBreachesDatatypes[index].checkInText(value));
+        }
+
+        return matchList;
+    };
+    
 
 };//EndClass.
 

@@ -145,18 +145,26 @@ QUnit.test("Test Privacy Checker", function(assert) {
     assert.ok(inferredType.datatype === prConfigFactory.DATATYPES.DT_MUNICIPALITY, "Recognizing the value " + value);
 
     value = "Salero";
-    var corrections = datachecker.correction(value);
+    var corrections = datachecker.testTyposErrors(value);
     console.log(corrections);
 
     value = "Saleron";
-    var corrections = datachecker.correction(value);
+    corrections = datachecker.testTyposErrors(value);
     console.log(corrections);
 
     value = "Salernoo";
-    var corrections = datachecker.correction(value);
+    corrections = datachecker.testTyposErrors(value);
     console.log(corrections);
 
     value = "Salervo";
-    var corrections = datachecker.correction(value);
+    corrections = datachecker.testTyposErrors(value);
     console.log(corrections);
+
+    value = "Il mio CF è PPPPLT80R10M082K";
+    var contentPrivacyBreaches = datachecker.testContentPrivacyBreaches(value);
+    console.log(contentPrivacyBreaches);
+
+    value = "Sono nato in via Genova n° 47, Salerno. Il mio IBAN è IT66C010050338 2000000218020 (349 12 34 567 per dettagli)";
+    contentPrivacyBreaches = datachecker.testContentPrivacyBreaches(value);
+    console.log(contentPrivacyBreaches);
 });
