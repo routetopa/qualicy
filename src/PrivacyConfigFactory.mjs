@@ -30,18 +30,36 @@
 
 const PRDATATYPES = {
     DT_UNKNOWN: { name: "UNKNOWN" },
+
     DT_EMAIL:   { name: "EMAIL" },
+    DT_URL : {name:"URL"},
     DT_CF:      { name: "CF" },
+    DT_IBAN : {name:"IBAN"},
+
     DT_ZIPCODE : { name: "ZIPCODE"},
+
     DT_MOBILEPHONE : { name: "MOBILE_PHONE"},
     DT_PHONE : { name: "PHONE"},
+
+    DT_LONGITUDE : {name:"LONGITUDE"},
+    DT_LATITUDE : {name:"LATITUDE"},
+    DT_LAT_LONG : {name:"LAT_LONG"},
+
     DT_ADDRESS : {name: "ADDRESS"},
-    DT_IBAN : {name:"IBAN"},
+    DT_PROVINCE : {name:"PROVINCE"},
+    DT_MUNICIPALITY : {name:"MUNICIPALITY"},
+    DT_REGION : {name:"REGION"},
+
+    DT_ATECO_CODE : {name:"ATECO"},
 
     DT_SURNAME : {name:"SURNAME"},
     DT_NAME : {name:"NAME"},
-    DT_PROVINCE : {name:"PROVINCE"},
-    DT_MUNICIPALITY : {name:"MUNICIPALITY"},
+
+    DT_RELIGION : {name:"RELIGION"},
+    DT_GENDER : {name:"GENDER"},
+    DT_MONEY : {name:"MONEY"},
+    DT_PERCENTAGE : {name:"PERCENTAGE"},
+    DT_DEGREE : {name:"DEGREE"}
 };
 
 const PRDATATYPES_LANGS = {
@@ -64,7 +82,9 @@ PRDATATYPES.DT_CF.evaluate = function (value) {
 PRDATATYPES.DT_EMAIL.evaluate = function (value) {
     var regex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
+    value = value.replace(/\s/g,'');
     value = value.toLowerCase();
+
     if (regex.test(value))
         return { datatype: PRDATATYPES.DT_EMAIL, value: value };
 
@@ -105,12 +125,30 @@ PRDATATYPES.DT_PHONE.evaluate = function(value) {
 };
 
 PRDATATYPES.DT_ADDRESS.evaluate = function (value) {
-    var regex = /^(via|viale|vico|v[.]|corso|c[.]so|piazza|piazzetta|p[.]|p[.]zza)\s([a-z]+\s?)+[,°]?\d*/i;
+    var regex = /^(via|viale|vico|v[.]|corso|c[.]so|piazza|piazzetta|p[.]|p[.]zza|parco|largo|traversa|contrada)\s([a-z]+\s?)+(([,°]?\s?\d*)?|(s.n.c.)?)/i;
 
     value = value.toLowerCase();
 
     if (regex.test(value))
         return { datatype: PRDATATYPES.DT_ADDRESS, value: value };
+
+    return { datatype: PRDATATYPES.DT_UNKNOWN, value: value };
+};
+
+PRDATATYPES.DT_LATITUDE.evaluate = function(value){
+    var regex = /^(\+|-)?(?:90(?:(?:\.0{1,6})?)|(?:[0-9]|[1-8][0-9])(?:(?:\.[0-9]{1,6})?))$/;
+
+    if (regex.test(value))
+        return { datatype: PRDATATYPES.DT_LATITUDE, value: value };
+
+    return { datatype: PRDATATYPES.DT_UNKNOWN, value: value };
+};
+
+PRDATATYPES.DT_LONGITUDE.evaluate = function(value){
+    var regex = /^(\+|-)?(?:180(?:(?:\.0{1,6})?)|(?:[0-9]|[1-9][0-9]|1[0-7][0-9])(?:(?:\.[0-9]{1,6})?))$/;
+
+    if (regex.test(value))
+        return { datatype: PRDATATYPES.DT_LONGITUDE, value: value };
 
     return { datatype: PRDATATYPES.DT_UNKNOWN, value: value };
 };
@@ -126,6 +164,93 @@ PRDATATYPES.DT_IBAN.evaluate = function (value) {
     return { datatype: PRDATATYPES.DT_UNKNOWN, value: value };
 };
 
+PRDATATYPES.DT_URL.evaluate = function(value){
+    value = value.replace(/\s/g,'');
+    var regex = /^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/;
+
+    value = value.toLowerCase();
+
+    if (regex.test(value))
+        return { datatype: PRDATATYPES.DT_URL, value: value };
+
+    return { datatype: PRDATATYPES.DT_UNKNOWN, value: value };
+};
+
+PRDATATYPES.DT_ATECO_CODE.evaluate = function(value){
+    value = value.replace(/\s/g,'');
+    //Regular Expression to match Italian Istat Ateco Code (formally Codice Istat) updated to Ateco-Istat 2004.
+    var regex = /^\d{2}[.]{1}\d{2}[.]{1}[0-9A-Za-z]{1}[p]?$/;
+
+    if (regex.test(value))
+        return { datatype: PRDATATYPES.DT_ATECO_CODE, value: value };
+
+    //Regular Expression to match Italian Istat Ateco Code (formally Codice Istat) updated to Ateco-Istat 2007.
+    var regex = /^\d{2}[.]{1}\d{2}[.]{1}[0-9]{2}$/;
+
+    if (regex.test(value))
+        return { datatype: PRDATATYPES.DT_ATECO_CODE, value: value };
+
+    return { datatype: PRDATATYPES.DT_UNKNOWN, value: value };
+}
+
+PRDATATYPES.DT_MONEY.evaluate = function(value){
+    value = value.replace(/\s/g,'');
+
+    //currency symbol at the end
+    var regex = /^-?((\d{1,3}(\.(\d){3})*)|\d*)(,\d{1,2})?((\u20AC)|(\$)|(£))$/;
+
+    if (regex.test(value))
+        return { datatype: PRDATATYPES.DT_MONEY, value: value };
+
+    //currency symbol at the beginning
+    var regex = /^((\u20AC)|(\$)|(£))-?((\d{1,3}(\.(\d){3})*)|\d*)(,\d{1,2})?$/;
+
+    if (regex.test(value))
+        return { datatype: PRDATATYPES.DT_MONEY, value: value };
+
+    return { datatype: PRDATATYPES.DT_UNKNOWN, value: value };
+};
+
+PRDATATYPES.DT_PERCENTAGE.evaluate = function(value){
+    value = value.replace(/\s/g,'');
+
+    var regex = /^(100|[0-9]{1,2}$|^[0-9]{1,2}\,[0-9]{1,3})%$/;
+
+    if (regex.test(value))
+        return { datatype: PRDATATYPES.DT_PERCENTAGE, value: value };
+
+    return { datatype: PRDATATYPES.DT_UNKNOWN, value: value };
+};
+
+PRDATATYPES.DT_DEGREE.evaluate = function(value){
+    value = value.replace(/\s/g,'');
+
+    //Celsius degree
+    var regex = /^(100|[0-9]{1,2}|-[0-9]|-[1-2][0-9]|-30)°C?$/;
+
+    if (regex.test(value))
+        return { datatype: PRDATATYPES.DT_DEGREE, value: value };
+
+    //Fahrenheit  degree
+    var regex = /^(^[0-9]{1,2}|220|2[1-2][0-9]|-[0-9]|-[1-2][0-9])°F$/;
+
+    if (regex.test(value))
+        return { datatype: PRDATATYPES.DT_DEGREE, value: value };
+
+    return { datatype: PRDATATYPES.DT_UNKNOWN, value: value };
+};
+
+PRDATATYPES.DT_LAT_LONG.evaluate = function(value){
+    value = value.replace(/\s/g,'');
+
+    var regex = /^([-+]?)([\d]{1,2})(((\.)(\d+)(,)))(\s*)(([-+]?)([\d]{1,3})((\.)(\d+))?)$/;
+
+    if (regex.test(value))
+        return { datatype: PRDATATYPES.DT_LAT_LONG, value: value };
+
+    return { datatype: PRDATATYPES.DT_UNKNOWN, value: value };
+};
+
 PRDATATYPES.DT_UNKNOWN.evaluate = function (value) {
     return { datatype: PRDATATYPES.DT_UNKNOWN, value: value };
 };
@@ -136,7 +261,6 @@ PRDATATYPES.DT_SURNAME.evaluate = function (value) {
     //value = value.toLowerCase();
     value = value.trim();
 
-    debugger
     if (value in most_popular_italian_surnames)
         return { datatype: PRDATATYPES.DT_SURNAME, value: value };
 
@@ -148,7 +272,6 @@ PRDATATYPES.DT_NAME.evaluate = function (value) {
     //value = value.toLowerCase();
     value = value.trim();
 
-    debugger
     if (value in most_popular_italian_names)
         return { datatype: PRDATATYPES.DT_NAME, value: value };
 
@@ -175,6 +298,34 @@ PRDATATYPES.DT_MUNICIPALITY.evaluate = function (value){
     var town_list = municipality["Campania"];
     if(town_list.indexOf(value)>=0)
         return { datatype: PRDATATYPES.DT_MUNICIPALITY, value: value };
+
+    return { datatype: PRDATATYPES.DT_UNKNOWN, value: value };
+};
+
+PRDATATYPES.DT_REGION.evaluate = function (value){
+    value = value.replace(/\s+/g, ' ').trim();
+    value = value.toLowerCase();
+
+    if(regions.indexOf(value)>=0)
+        return { datatype: PRDATATYPES.DT_REGION, value: value };
+
+    return { datatype: PRDATATYPES.DT_UNKNOWN, value: value };
+};
+
+PRDATATYPES.DT_RELIGION.evaluate = function (value){
+    value = value.toLowerCase();
+
+    if(value in religions)
+        return { datatype: PRDATATYPES.DT_RELIGION, value: value };
+
+    return { datatype: PRDATATYPES.DT_UNKNOWN, value: value };
+};
+
+PRDATATYPES.DT_GENDER.evaluate = function (value){
+    value = value.toLowerCase();
+
+    if(genders.indexOf(value)>=0)
+        return { datatype: PRDATATYPES.DT_GENDER, value: value };
 
     return { datatype: PRDATATYPES.DT_UNKNOWN, value: value };
 };
@@ -496,7 +647,7 @@ const municipality = {
         "atripalda",
         "auletta",
         "avella",
-        "avellino",
+        //"avellino",
         "aversa",
         "bacoli",
         "bagnoli irpino",
@@ -509,7 +660,7 @@ const municipality = {
         "bellizzi",
         "bellona",
         "bellosguardo",
-        "benevento",
+        //"benevento",
         "bisaccia",
         "bonea",
         "bonito",
@@ -570,7 +721,7 @@ const municipality = {
         "casapulla",
         "casavatore",
         "caselle in pittari",
-        "caserta",
+        //"caserta",
         "casola di napoli",
         "casoria",
         "cassano irpino",
@@ -753,7 +904,7 @@ const municipality = {
         "moschiano",
         "mugnano del cardinale",
         "mugnano di napoli",
-        "napoli",
+        //"napoli",
         "nocera inferiore",
         "nocera superiore",
         "nola",
@@ -855,7 +1006,7 @@ const municipality = {
         "sacco",
         "sala consilina",
         "salento",
-        "salerno",
+        //"salerno",
         "salvitelle",
         "salza irpina",
         "san bartolomeo in galdo",
@@ -1013,7 +1164,68 @@ const municipality = {
         "volturara irpina",
         "zungoli"],
 };
+const regions = [
+    "abruzzo",
+    "basilicata",
+    "calabria",
+    "campania",
+    "emilia romagna",
+    "friuli venezia giulia",
+    "Lazio",
+    "liguria",
+    "lombardia",
+    "marche",
+    "molise",
+    "piemonte",
+    "puglia",
+    "sardegna",
+    "sicilia",
+    "toscana",
+    "trentino alto adige",
+    "umbria",
+    "valle d'aosta",
+    "veneto",
+];
 
+const religions = {
+    "cristianità" : "",
+    "islam" : "",
+
+    "induismo" : "",
+    "buddhismo" : "",
+    "sikhismo" : "",
+    "ebraismo" : "",
+    "bahaismo" : "",
+    "confucianesimo" : "",
+    "giainismo" : "",
+    "shintoismo" : "",
+    "cristianesimo" : "",
+    "taoismo" : "",
+    "zoroastrismo" : "",
+
+    "cristiana" : "",
+    "islamica" : "",
+    "induista" : "",
+    "buddhista" : "",
+    "sikista" : "",
+    "ebraica" : "",
+    "behaista" : "",
+    "gianista" : "",
+    "shitoista" : "",
+    "taoista" : "",
+    "zoroastrica" : "",
+
+    "cristiano" : "",
+    "islamista" : "",
+    "ebreo" : "",
+
+    "religione cristiana" : "",
+    "religione islamica" : "",
+    "religione buddhista" : "",
+    "religione ebraica" : "",
+};
+
+const genders = ["maschio", "femmina", "uomo", "donna", "f", "m"];
 /*
 const most_popular_italian_names = [
     "Francesco",
@@ -1165,8 +1377,26 @@ PRDATATYPES.DT_NAME.correct = function (words, value) {
     return corrections;
 };
 
-function editDistance1(word) {
-    word = word.toLowerCase().split('');
+PRDATATYPES.DT_RELIGION.correct = function (words, value) {
+    var corrections = [];
+
+    for(var key in words){
+        var current_datatype = PRDATATYPES.DT_RELIGION.evaluate(key);
+        if(current_datatype.datatype!=PRDATATYPES.DT_UNKNOWN) {
+            corrections.push({
+                datatype: PRDATATYPES.DT_RELIGION,
+                value: value,
+                num_of_modifications: words[key],
+                correction: key
+            });
+        }
+    }
+    return corrections;
+};
+
+function editDistance1(originalWord) {
+    originalWord = originalWord.toLowerCase();
+    var word = originalWord.split('');
     var results = {};
     var alphabet = "abcdefghijklmnopqrstuvwxyz";
 
@@ -1210,6 +1440,11 @@ function editDistance1(word) {
             results[newWord] = 1;
         }
     }
+    debugger
+    if(originalWord in results){
+        delete results[originalWord];
+    }
+
 
     return results;
 }
@@ -1552,15 +1787,17 @@ export class PrivacyConfigFactory {
     }
 
     get types() {
-        return [PRDATATYPES.DT_EMAIL, PRDATATYPES.DT_CF, PRDATATYPES.DT_ZIPCODE, PRDATATYPES.DT_MOBILEPHONE, PRDATATYPES.DT_PHONE, PRDATATYPES.DT_ADDRESS, PRDATATYPES.DT_IBAN,
-            PRDATATYPES.DT_PROVINCE, PRDATATYPES.DT_MUNICIPALITY,
+        return [PRDATATYPES.DT_EMAIL, PRDATATYPES.DT_CF, PRDATATYPES.DT_ZIPCODE, PRDATATYPES.DT_MOBILEPHONE, PRDATATYPES.DT_PHONE, PRDATATYPES.DT_ADDRESS, PRDATATYPES.DT_IBAN, PRDATATYPES.DT_URL, PRDATATYPES.DT_ATECO_CODE,
+            PRDATATYPES.DT_LAT_LONG, PRDATATYPES.DT_PERCENTAGE, PRDATATYPES.DT_MONEY, PRDATATYPES.DT_DEGREE, PRDATATYPES.DT_LONGITUDE, PRDATATYPES.DT_LATITUDE,
+            PRDATATYPES.DT_GENDER, PRDATATYPES.DT_RELIGION, PRDATATYPES.DT_REGION, PRDATATYPES.DT_PROVINCE, PRDATATYPES.DT_MUNICIPALITY,
             PRDATATYPES.DT_SURNAME, PRDATATYPES.DT_NAME,
             PRDATATYPES.DT_UNKNOWN];
     }
 
     get typosCheckingTypes() {
         return [PRDATATYPES.DT_PROVINCE, PRDATATYPES.DT_MUNICIPALITY,
-            PRDATATYPES.DT_SURNAME, PRDATATYPES.DT_NAME];
+            PRDATATYPES.DT_SURNAME, PRDATATYPES.DT_NAME,
+            PRDATATYPES.DT_RELIGION];
     }
 
     get contentPrivacyBreachesTypes() {
@@ -1609,7 +1846,7 @@ export class PrivacyConfigFactory {
 
         return matchList;
     };
-    
+
 
 };//EndClass.
 

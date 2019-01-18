@@ -161,7 +161,7 @@
  **
  **/
 
- class DataChecker {
+class DataChecker {
 
     constructor(configFactory) {
         this._dataTypeConfigFactory = configFactory;
@@ -247,10 +247,72 @@
         }//EndFor.
 
         return evaLog;
-     };//EndFunction.
+    };//EndFunction.
 
+    detectTyposErrorsCorrections(value) {
+        return this._dataTypeConfigFactory.testTyposErrors(value);
+    }
 
+    testTyposErrors(dataset, fieldKeys, options) {
+        let evaLog = []; //Stack with all the issues found in the dataset.
+        let annotateInputDataset = false;
 
+        //Manage the options.
+        if (typeof options !== "undefined") {
+            annotateInputDataset = (options.annotateInputDataset !== "undefined" && options.annotateInputDataset);
+        }
+
+        for (let irow=0; irow<dataset.length; irow++) {
+            let row = dataset[irow];
+
+            for (let ikey=0; ikey<fieldKeys.length; ikey++) {
+                let key = fieldKeys[ikey];
+
+                //Value to evaluate.
+                let fieldValue = row[key.name] + '';
+
+                //
+                //if (typeof value === 'undefined')
+                //   return  { datatype: PRDATATYPES.DT_UNKNOWN, value: value };
+
+                let _typosCorrections =  this.detectTyposErrorsCorrections(fieldValue);
+
+                if (_typosCorrections.length != 0 ) {
+                    //TODO manage description and internationalization
+
+                    //let _keydescr = "key_descr_" + _inferredType.datatype.name;
+                    //let descr = this._dataTypeConfigFactory.translate(_keydescr, "EN");
+                    let descr = "TYPOS ERROR: ";
+                    for(let correction_index = 0; correction_index < _typosCorrections.length; correction_index++){
+                        let correction = _typosCorrections[correction_index];
+                        descr += correction.correction;
+                    }
+
+                    let evaLogItem = {
+                        i: irow,
+                        j: ikey,
+                        key: key.name,
+                        value: fieldValue,
+                        datatype: "TYPOS ERROR",
+                        descr: descr
+                    };
+
+                    //The user accepted the annotation of the original dataset.
+                    if (annotateInputDataset) {
+                        row.__qualicy = evaLogItem;
+                    }
+
+                    evaLog.push(evaLogItem);
+                }
+
+            }
+        }
+        return evaLog;
+    };//EndFunction.
+
+    testContentPrivacyBreaches(value){
+        return this._dataTypeConfigFactory.testContentPrivacyBreaches(value);
+    }
 
 }//EndClass.
 /*
@@ -274,7 +336,7 @@
  ** License: http://www.gnu.org/licenses/gpl.html GPL version 3 or higher
  **/
 
- class Utils {
+class Utils {
 
     /**
      * Utility to make an http request. It returns a promise.
@@ -328,7 +390,7 @@
  ** A basic configuration for the privacy module.
  **/
 
- class PrivacyReportViewBuilder {
+class PrivacyReportViewBuilder {
 
     /**
      * It builds a report in which the statistics are provided
@@ -400,18 +462,36 @@
 
 const PRDATATYPES = {
     DT_UNKNOWN: { name: "UNKNOWN" },
+
     DT_EMAIL:   { name: "EMAIL" },
+    DT_URL : {name:"URL"},
     DT_CF:      { name: "CF" },
+    DT_IBAN : {name:"IBAN"},
+
     DT_ZIPCODE : { name: "ZIPCODE"},
+
     DT_MOBILEPHONE : { name: "MOBILE_PHONE"},
     DT_PHONE : { name: "PHONE"},
+
+    DT_LONGITUDE : {name:"LONGITUDE"},
+    DT_LATITUDE : {name:"LATITUDE"},
+    DT_LAT_LONG : {name:"LAT_LONG"},
+
     DT_ADDRESS : {name: "ADDRESS"},
-    DT_IBAN : {name:"IBAN"},
+    DT_PROVINCE : {name:"PROVINCE"},
+    DT_MUNICIPALITY : {name:"MUNICIPALITY"},
+    DT_REGION : {name:"REGION"},
+
+    DT_ATECO_CODE : {name:"ATECO"},
 
     DT_SURNAME : {name:"SURNAME"},
     DT_NAME : {name:"NAME"},
-    DT_PROVINCE : {name:"PROVINCE"},
-    DT_MUNICIPALITY : {name:"MUNICIPALITY"},
+
+    DT_RELIGION : {name:"RELIGION"},
+    DT_GENDER : {name:"GENDER"},
+    DT_MONEY : {name:"MONEY"},
+    DT_PERCENTAGE : {name:"PERCENTAGE"},
+    DT_DEGREE : {name:"DEGREE"}
 };
 
 const PRDATATYPES_LANGS = {
@@ -434,7 +514,9 @@ PRDATATYPES.DT_CF.evaluate = function (value) {
 PRDATATYPES.DT_EMAIL.evaluate = function (value) {
     var regex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
+    value = value.replace(/\s/g,'');
     value = value.toLowerCase();
+
     if (regex.test(value))
         return { datatype: PRDATATYPES.DT_EMAIL, value: value };
 
@@ -475,12 +557,30 @@ PRDATATYPES.DT_PHONE.evaluate = function(value) {
 };
 
 PRDATATYPES.DT_ADDRESS.evaluate = function (value) {
-    var regex = /^(via|viale|vico|v[.]|corso|c[.]so|piazza|piazzetta|p[.]|p[.]zza)\s([a-z]+\s?)+[,°]?\d*/i;
+    var regex = /^(via|viale|vico|v[.]|corso|c[.]so|piazza|piazzetta|p[.]|p[.]zza|parco|largo|traversa|contrada)\s([a-z]+\s?)+(([,°]?\s?\d*)?|(s.n.c.)?)/i;
 
     value = value.toLowerCase();
 
     if (regex.test(value))
         return { datatype: PRDATATYPES.DT_ADDRESS, value: value };
+
+    return { datatype: PRDATATYPES.DT_UNKNOWN, value: value };
+};
+
+PRDATATYPES.DT_LATITUDE.evaluate = function(value){
+    var regex = /^(\+|-)?(?:90(?:(?:\.0{1,6})?)|(?:[0-9]|[1-8][0-9])(?:(?:\.[0-9]{1,6})?))$/;
+
+    if (regex.test(value))
+        return { datatype: PRDATATYPES.DT_LATITUDE, value: value };
+
+    return { datatype: PRDATATYPES.DT_UNKNOWN, value: value };
+};
+
+PRDATATYPES.DT_LONGITUDE.evaluate = function(value){
+    var regex = /^(\+|-)?(?:180(?:(?:\.0{1,6})?)|(?:[0-9]|[1-9][0-9]|1[0-7][0-9])(?:(?:\.[0-9]{1,6})?))$/;
+
+    if (regex.test(value))
+        return { datatype: PRDATATYPES.DT_LONGITUDE, value: value };
 
     return { datatype: PRDATATYPES.DT_UNKNOWN, value: value };
 };
@@ -496,11 +596,172 @@ PRDATATYPES.DT_IBAN.evaluate = function (value) {
     return { datatype: PRDATATYPES.DT_UNKNOWN, value: value };
 };
 
+PRDATATYPES.DT_URL.evaluate = function(value){
+    value = value.replace(/\s/g,'');
+    var regex = /^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/;
+
+    value = value.toLowerCase();
+
+    if (regex.test(value))
+        return { datatype: PRDATATYPES.DT_URL, value: value };
+
+    return { datatype: PRDATATYPES.DT_UNKNOWN, value: value };
+};
+
+PRDATATYPES.DT_ATECO_CODE.evaluate = function(value){
+    value = value.replace(/\s/g,'');
+    //Regular Expression to match Italian Istat Ateco Code (formally Codice Istat) updated to Ateco-Istat 2004.
+    var regex = /^\d{2}[.]{1}\d{2}[.]{1}[0-9A-Za-z]{1}[p]?$/;
+
+    if (regex.test(value))
+        return { datatype: PRDATATYPES.DT_ATECO_CODE, value: value };
+
+    //Regular Expression to match Italian Istat Ateco Code (formally Codice Istat) updated to Ateco-Istat 2007.
+    var regex = /^\d{2}[.]{1}\d{2}[.]{1}[0-9]{2}$/;
+
+    if (regex.test(value))
+        return { datatype: PRDATATYPES.DT_ATECO_CODE, value: value };
+
+    return { datatype: PRDATATYPES.DT_UNKNOWN, value: value };
+}
+
+PRDATATYPES.DT_MONEY.evaluate = function(value){
+    value = value.replace(/\s/g,'');
+
+    //currency symbol at the end
+    var regex = /^-?((\d{1,3}(\.(\d){3})*)|\d*)(,\d{1,2})?((\u20AC)|(\$)|(£))$/;
+
+    if (regex.test(value))
+        return { datatype: PRDATATYPES.DT_MONEY, value: value };
+
+    //currency symbol at the beginning
+    var regex = /^((\u20AC)|(\$)|(£))-?((\d{1,3}(\.(\d){3})*)|\d*)(,\d{1,2})?$/;
+
+    if (regex.test(value))
+        return { datatype: PRDATATYPES.DT_MONEY, value: value };
+
+    return { datatype: PRDATATYPES.DT_UNKNOWN, value: value };
+};
+
+PRDATATYPES.DT_PERCENTAGE.evaluate = function(value){
+    value = value.replace(/\s/g,'');
+
+    var regex = /^(100|[0-9]{1,2}$|^[0-9]{1,2}\,[0-9]{1,3})%$/;
+
+    if (regex.test(value))
+        return { datatype: PRDATATYPES.DT_PERCENTAGE, value: value };
+
+    return { datatype: PRDATATYPES.DT_UNKNOWN, value: value };
+};
+
+PRDATATYPES.DT_DEGREE.evaluate = function(value){
+    value = value.replace(/\s/g,'');
+
+    //Celsius degree
+    var regex = /^(100|[0-9]{1,2}|-[0-9]|-[1-2][0-9]|-30)°C?$/;
+
+    if (regex.test(value))
+        return { datatype: PRDATATYPES.DT_DEGREE, value: value };
+
+    //Fahrenheit  degree
+    var regex = /^(^[0-9]{1,2}|220|2[1-2][0-9]|-[0-9]|-[1-2][0-9])°F$/;
+
+    if (regex.test(value))
+        return { datatype: PRDATATYPES.DT_DEGREE, value: value };
+
+    return { datatype: PRDATATYPES.DT_UNKNOWN, value: value };
+};
+
+PRDATATYPES.DT_LAT_LONG.evaluate = function(value){
+    value = value.replace(/\s/g,'');
+
+    var regex = /^([-+]?)([\d]{1,2})(((\.)(\d+)(,)))(\s*)(([-+]?)([\d]{1,3})((\.)(\d+))?)$/;
+
+    if (regex.test(value))
+        return { datatype: PRDATATYPES.DT_LAT_LONG, value: value };
+
+    return { datatype: PRDATATYPES.DT_UNKNOWN, value: value };
+};
+
 PRDATATYPES.DT_UNKNOWN.evaluate = function (value) {
     return { datatype: PRDATATYPES.DT_UNKNOWN, value: value };
 };
 
 //dictionaries
+PRDATATYPES.DT_SURNAME.evaluate = function (value) {
+
+    //value = value.toLowerCase();
+    value = value.trim();
+
+    if (value in most_popular_italian_surnames)
+        return { datatype: PRDATATYPES.DT_SURNAME, value: value };
+
+    return { datatype: PRDATATYPES.DT_UNKNOWN, value: value };
+};
+
+PRDATATYPES.DT_NAME.evaluate = function (value) {
+
+    //value = value.toLowerCase();
+    value = value.trim();
+
+    if (value in most_popular_italian_names)
+        return { datatype: PRDATATYPES.DT_NAME, value: value };
+
+    return { datatype: PRDATATYPES.DT_UNKNOWN, value: value };
+};
+
+PRDATATYPES.DT_PROVINCE.evaluate = function (value){
+    value = value.replace(/\s+/g, ' ').trim();
+    value = value.toLowerCase();
+
+    if(value in province)
+        return { datatype: PRDATATYPES.DT_PROVINCE, value: value };
+
+    if(value in province_abbreviation)
+        return { datatype: PRDATATYPES.DT_PROVINCE, value: value };
+
+    return { datatype: PRDATATYPES.DT_UNKNOWN, value: value };
+};
+
+PRDATATYPES.DT_MUNICIPALITY.evaluate = function (value){
+    value = value.replace(/\s+/g, ' ').trim();
+    value = value.toLowerCase();
+
+    var town_list = municipality["Campania"];
+    if(town_list.indexOf(value)>=0)
+        return { datatype: PRDATATYPES.DT_MUNICIPALITY, value: value };
+
+    return { datatype: PRDATATYPES.DT_UNKNOWN, value: value };
+};
+
+PRDATATYPES.DT_REGION.evaluate = function (value){
+    value = value.replace(/\s+/g, ' ').trim();
+    value = value.toLowerCase();
+
+    if(regions.indexOf(value)>=0)
+        return { datatype: PRDATATYPES.DT_REGION, value: value };
+
+    return { datatype: PRDATATYPES.DT_UNKNOWN, value: value };
+};
+
+PRDATATYPES.DT_RELIGION.evaluate = function (value){
+    value = value.toLowerCase();
+
+    if(value in religions)
+        return { datatype: PRDATATYPES.DT_RELIGION, value: value };
+
+    return { datatype: PRDATATYPES.DT_UNKNOWN, value: value };
+};
+
+PRDATATYPES.DT_GENDER.evaluate = function (value){
+    value = value.toLowerCase();
+
+    if(genders.indexOf(value)>=0)
+        return { datatype: PRDATATYPES.DT_GENDER, value: value };
+
+    return { datatype: PRDATATYPES.DT_UNKNOWN, value: value };
+};
+
 const most_popular_italian_surnames = {
     "Aiello":"",
     "Amato":"",
@@ -769,10 +1030,18 @@ const most_popular_italian_surnames = {
 };
 
 const province = {
-    "Campania":["avellino", "benevento", "caserta", "napoli", "salerno"],
+    "avellino" : "Campania",
+    "benevento" : "Campania",
+    "caserta" : "Campania",
+    "napoli" : "Campania",
+    "salerno" : "Campania"
 };
 const province_abbreviation = {
-    "Campania":["av", "bn", "ce", "na", "sa"],
+    "av" : "Campania",
+    "bn" : "Campania",
+    "ce" : "Campania",
+    "na" : "Campania",
+    "sa" : "Campania"
 };
 
 const municipality = {
@@ -810,7 +1079,7 @@ const municipality = {
         "atripalda",
         "auletta",
         "avella",
-        "avellino",
+        //"avellino",
         "aversa",
         "bacoli",
         "bagnoli irpino",
@@ -823,7 +1092,7 @@ const municipality = {
         "bellizzi",
         "bellona",
         "bellosguardo",
-        "benevento",
+        //"benevento",
         "bisaccia",
         "bonea",
         "bonito",
@@ -884,7 +1153,7 @@ const municipality = {
         "casapulla",
         "casavatore",
         "caselle in pittari",
-        "caserta",
+        //"caserta",
         "casola di napoli",
         "casoria",
         "cassano irpino",
@@ -1067,7 +1336,7 @@ const municipality = {
         "moschiano",
         "mugnano del cardinale",
         "mugnano di napoli",
-        "napoli",
+        //"napoli",
         "nocera inferiore",
         "nocera superiore",
         "nola",
@@ -1169,7 +1438,7 @@ const municipality = {
         "sacco",
         "sala consilina",
         "salento",
-        "salerno",
+        //"salerno",
         "salvitelle",
         "salza irpina",
         "san bartolomeo in galdo",
@@ -1327,7 +1596,68 @@ const municipality = {
         "volturara irpina",
         "zungoli"],
 };
+const regions = [
+    "abruzzo",
+    "basilicata",
+    "calabria",
+    "campania",
+    "emilia romagna",
+    "friuli venezia giulia",
+    "Lazio",
+    "liguria",
+    "lombardia",
+    "marche",
+    "molise",
+    "piemonte",
+    "puglia",
+    "sardegna",
+    "sicilia",
+    "toscana",
+    "trentino alto adige",
+    "umbria",
+    "valle d'aosta",
+    "veneto",
+];
 
+const religions = {
+    "cristianità" : "",
+    "islam" : "",
+
+    "induismo" : "",
+    "buddhismo" : "",
+    "sikhismo" : "",
+    "ebraismo" : "",
+    "bahaismo" : "",
+    "confucianesimo" : "",
+    "giainismo" : "",
+    "shintoismo" : "",
+    "cristianesimo" : "",
+    "taoismo" : "",
+    "zoroastrismo" : "",
+
+    "cristiana" : "",
+    "islamica" : "",
+    "induista" : "",
+    "buddhista" : "",
+    "sikista" : "",
+    "ebraica" : "",
+    "behaista" : "",
+    "gianista" : "",
+    "shitoista" : "",
+    "taoista" : "",
+    "zoroastrica" : "",
+
+    "cristiano" : "",
+    "islamista" : "",
+    "ebreo" : "",
+
+    "religione cristiana" : "",
+    "religione islamica" : "",
+    "religione buddhista" : "",
+    "religione ebraica" : "",
+};
+
+const genders = ["maschio", "femmina", "uomo", "donna", "f", "m"];
 /*
 const most_popular_italian_names = [
     "Francesco",
@@ -1409,66 +1739,106 @@ const most_popular_italian_names = [
 
 var most_popular_italian_names = {};
 
-PRDATATYPES.DT_SURNAME.evaluate = function (value) {
 
-    value = value.toLowerCase();
-    value = value.trim();
+PRDATATYPES.DT_PROVINCE.correct = function (words, value) {
+    var corrections = [];
 
-    if (value in most_popular_italian_surnames)
-        return { datatype: PRDATATYPES.DT_SURNAME, value: value };
-
-    return { datatype: PRDATATYPES.DT_UNKNOWN, value: value };
+    for(var key in words){
+        var current_datatype = PRDATATYPES.DT_PROVINCE.evaluate(key);
+        if(current_datatype.datatype!=PRDATATYPES.DT_UNKNOWN) {
+            corrections.push({
+                datatype: PRDATATYPES.DT_PROVINCE,
+                value: value,
+                num_of_modifications: words[key],
+                correction: key
+            });
+        }
+    }
+    return corrections;
 };
 
-PRDATATYPES.DT_NAME.evaluate = function (value) {
+PRDATATYPES.DT_MUNICIPALITY.correct = function (words, value) {
+    var corrections = [];
 
-    value = value.toLowerCase();
-    value = value.trim();
+    for(var key in words){
+        var current_datatype = PRDATATYPES.DT_MUNICIPALITY.evaluate(key);
+        if(current_datatype.datatype!=PRDATATYPES.DT_UNKNOWN) {
+            corrections.push({
+                datatype: PRDATATYPES.DT_MUNICIPALITY,
+                value: value,
+                num_of_modifications: words[key],
+                correction: key
+            });
+        }
+    }
 
-    if (value in most_popular_italian_names)
-        return { datatype: PRDATATYPES.DT_NAME, value: value };
-
-    return { datatype: PRDATATYPES.DT_UNKNOWN, value: value };
+    return corrections;
 };
 
-PRDATATYPES.DT_PROVINCE.evaluate = function (value){
-    value = value.toLowerCase();
-    value = value.trim();
+PRDATATYPES.DT_SURNAME.correct = function (words, value) {
+    var corrections = [];
 
-    //ad hoc for Campania
-    var province_list = province["Campania"];
-    if(province_list.indexOf(value)>=0)
-        return { datatype: PRDATATYPES.DT_PROVINCE, value: value };
-
-    var province_abbreviation_list = province_abbreviation["Campania"];
-    if(province_abbreviation_list.indexOf(value)>=0)
-        return { datatype: PRDATATYPES.DT_PROVINCE, value: value };
-
-    return { datatype: PRDATATYPES.DT_UNKNOWN, value: value };
+    for(var key in words){
+        var current_datatype = PRDATATYPES.DT_SURNAME.evaluate(key);
+        if(current_datatype.datatype!=PRDATATYPES.DT_UNKNOWN) {
+            corrections.push({
+                datatype: PRDATATYPES.DT_SURNAME,
+                value: value,
+                num_of_modifications: words[key],
+                correction: key
+            });
+        }
+    }
+    return corrections;
 };
 
-PRDATATYPES.DT_MUNICIPALITY.evaluate = function (value){
-    value = value.toLowerCase();
-    value = value.trim();
+PRDATATYPES.DT_NAME.correct = function (words, value) {
+    var corrections = [];
 
-    //ad hoc for Campania
-    var town_list = municipality["Campania"];
-    if(town_list.indexOf(value)>=0)
-        return { datatype: PRDATATYPES.DT_MUNICIPALITY, value: value };
-
-    return { datatype: PRDATATYPES.DT_UNKNOWN, value: value };
+    for(var key in words){
+        var current_datatype = PRDATATYPES.DT_NAME.evaluate(key);
+        if(current_datatype.datatype!=PRDATATYPES.DT_UNKNOWN) {
+            corrections.push({
+                datatype: PRDATATYPES.DT_NAME,
+                value: value,
+                num_of_modifications: words[key],
+                correction: key
+            });
+        }
+    }
+    return corrections;
 };
 
-function editDistance1(word) {
-    word = word.toLowerCase().split('');
-    var results = [];
+PRDATATYPES.DT_RELIGION.correct = function (words, value) {
+    var corrections = [];
+
+    for(var key in words){
+        var current_datatype = PRDATATYPES.DT_RELIGION.evaluate(key);
+        if(current_datatype.datatype!=PRDATATYPES.DT_UNKNOWN) {
+            corrections.push({
+                datatype: PRDATATYPES.DT_RELIGION,
+                value: value,
+                num_of_modifications: words[key],
+                correction: key
+            });
+        }
+    }
+    return corrections;
+};
+
+function editDistance1(originalWord) {
+    originalWord = originalWord.toLowerCase();
+    var word = originalWord.split('');
+    var alphabet = "abcdefghijklmnopqrstuvwxyz";
+    var results = {};
 
     //Adding any one character (from the alphabet) anywhere in the word.
     for(var i = 0; i <= word.length; i++){
         for(var j = 0; j < alphabet.length; j++){
             var newWord = word.slice();
             newWord.splice(i, 0, alphabet[j]);
-            results.push(newWord.join(''));
+            newWord = newWord.join('');
+            results[newWord] = 1;
         }
     }
 
@@ -1477,7 +1847,8 @@ function editDistance1(word) {
         for(var i = 0; i < word.length; i++){
             var newWord = word.slice();
             newWord.splice(i,1);
-            results.push(newWord.join(''));
+            newWord = newWord.join('');
+            results[newWord] = 1;
         }
     }
 
@@ -1487,7 +1858,8 @@ function editDistance1(word) {
             var newWord = word.slice();
             var r = newWord.splice(i,1);
             newWord.splice(i + 1, 0, r[0]);
-            results.push(newWord.join(''));
+            newWord = newWord.join('');
+            results[newWord] = 1;
         }
     }
 
@@ -1496,18 +1868,130 @@ function editDistance1(word) {
         for(var j = 0; j < alphabet.length; j++){
             var newWord = word.slice();
             newWord[i] = alphabet[j];
-            results.push(newWord.join(''));
+            newWord = newWord.join('');
+            results[newWord] = 1;
         }
     }
-
+    if(originalWord in results){
+        delete results[originalWord];
+    }
     return results;
 }
+
+
+
+PRDATATYPES.DT_CF.checkInText = function (value) {
+    var regex = /(?:(?:[B-DF-HJ-NP-TV-Z]|[AEIOU])[AEIOU][AEIOUX]|[B-DF-HJ-NP-TV-Z]{2}[A-Z]){2}[\dLMNP-V]{2}(?:[A-EHLMPR-T](?:[04LQ][1-9MNP-V]|[1256LMRS][\dLMNP-V])|[DHPS][37PT][0L]|[ACELMRT][37PT][01LM])(?:[A-MZ][1-9MNP-V][\dLMNP-V]{2}|[A-M][0L](?:[1-9MNP-V][\dLMNP-V]|[0L][1-9MNP-V]))[A-Z]/ig;
+
+    value = value.toLowerCase();
+    var matchList = [];
+    var match = regex.exec(value);
+    while (match != null) {
+        matchList.push({ datatype: PRDATATYPES.DT_CF, value: value, match:match[0]});
+        match = regex.exec(value);
+    }
+
+    return matchList;
+};
+
+PRDATATYPES.DT_EMAIL.checkInText = function (value) {
+    var regex = /(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))/g;
+
+    value = value.toLowerCase();
+    var matchList = [];
+    var match = regex.exec(value);
+    while (match != null) {
+        matchList.push({ datatype: PRDATATYPES.DT_EMAIL, value: value, match:match[0]});
+        match = regex.exec(value);
+    }
+
+    return matchList;
+};
+
+PRDATATYPES.DT_ZIPCODE.checkInText = function(value) {
+    var regex = /([0-9]{5})/g;
+
+    //value = value.toLowerCase();
+    var matchList = [];
+    var match = regex.exec(value);
+    while (match != null) {
+        matchList.push({ datatype: PRDATATYPES.DT_ZIPCODE, value: value, match:match[0]});
+        match = regex.exec(value);
+    }
+
+    return matchList;
+};
+
+PRDATATYPES.DT_MOBILEPHONE.checkInText = function(value)  {
+    var regex = /(\((([+]|00)39)\)|(([+]|00)39))?((313)|(32[034789])|(33[013456789])|(34[02456789])|(36[0368])|(37[037])|(38[0389])|(39[0123]))([\d]{7})/g;
+
+    value = value.replace(/-/gm, '');
+    value = value.replace(/\s/g,'');
+
+    //value = value.toLowerCase();
+    var matchList = [];
+    var match = regex.exec(value);
+    while (match != null) {
+        matchList.push({ datatype: PRDATATYPES.DT_MOBILEPHONE, value: value, match:match[0]});
+        match = regex.exec(value);
+    }
+
+    return matchList;
+};
+
+PRDATATYPES.DT_PHONE.checkInText = function(value) {
+    var regex = /(\((([+]|00)39)\)|(([+]|00)39))?0([\d]{11}|[\d]{10}|[\d]{9}|[\d]{8})/g;
+
+    value = value.replace(/-/gm, '');
+    value = value.replace(/\s/g,'');
+
+    //value = value.toLowerCase();
+    var matchList = [];
+    var match = regex.exec(value);
+    while (match != null) {
+        matchList.push({ datatype: PRDATATYPES.DT_PHONE, value: value, match:match[0]});
+        match = regex.exec(value);
+    }
+
+    return matchList;
+};
+
+PRDATATYPES.DT_ADDRESS.checkInText = function (value) {
+    var regex = /(via|viale|vico|v[.]|corso|c[.]so|piazza|piazzetta|p[.]|p[.]zza)\s([a-z]+\s?)+([,°][ ]?)?\d*/ig;
+
+    value = value.toLowerCase();
+
+    var matchList = [];
+    var match = regex.exec(value);
+    while (match != null) {
+        matchList.push({ datatype: PRDATATYPES.DT_ADDRESS, value: value, match:match[0]});
+        match = regex.exec(value);
+    }
+
+    return matchList;
+};
+
+PRDATATYPES.DT_IBAN.checkInText = function (value) {
+    var regex = /[a-zA-Z]{2}[0-9]{2}[a-zA-Z0-9]{4}[0-9]{7}([a-zA-Z0-9]?){0,16}/ig;
+
+    value = value.replace(/\s/g,'');
+
+    var matchList = [];
+    var match = regex.exec(value);
+    while (match != null) {
+        matchList.push({ datatype: PRDATATYPES.DT_IBAN, value: value, match:match[0]});
+        match = regex.exec(value);
+    }
+
+    return matchList;
+};
+
 
 //////////////////////////////////////////////////////////////////////////
 //// The factory class for the configuration of the privacy module.
 ////
 
- class PrivacyConfigFactory {
+class PrivacyConfigFactory {
 
     constructor() {
         /*
@@ -1732,9 +2216,21 @@ function editDistance1(word) {
     }
 
     get types() {
-        return [ PRDATATYPES.DT_EMAIL, PRDATATYPES.DT_CF, PRDATATYPES.DT_ZIPCODE, PRDATATYPES.DT_MOBILEPHONE, PRDATATYPES.DT_PHONE, PRDATATYPES.DT_ADDRESS, PRDATATYPES.DT_IBAN,
+        return [PRDATATYPES.DT_EMAIL, PRDATATYPES.DT_CF, PRDATATYPES.DT_ZIPCODE, PRDATATYPES.DT_MOBILEPHONE, PRDATATYPES.DT_PHONE, PRDATATYPES.DT_ADDRESS, PRDATATYPES.DT_IBAN, PRDATATYPES.DT_URL, PRDATATYPES.DT_ATECO_CODE,
+            PRDATATYPES.DT_LAT_LONG, PRDATATYPES.DT_PERCENTAGE, PRDATATYPES.DT_MONEY, PRDATATYPES.DT_DEGREE, PRDATATYPES.DT_LONGITUDE, PRDATATYPES.DT_LATITUDE,
+            PRDATATYPES.DT_GENDER, PRDATATYPES.DT_RELIGION, PRDATATYPES.DT_REGION, PRDATATYPES.DT_PROVINCE, PRDATATYPES.DT_MUNICIPALITY,
             PRDATATYPES.DT_SURNAME, PRDATATYPES.DT_NAME,
             PRDATATYPES.DT_UNKNOWN];
+    }
+
+    get typosCheckingTypes() {
+        return [PRDATATYPES.DT_PROVINCE, PRDATATYPES.DT_MUNICIPALITY,
+            PRDATATYPES.DT_SURNAME, PRDATATYPES.DT_NAME,
+            PRDATATYPES.DT_RELIGION];
+    }
+
+    get contentPrivacyBreachesTypes() {
+        return [PRDATATYPES.DT_EMAIL, PRDATATYPES.DT_CF, PRDATATYPES.DT_IBAN, PRDATATYPES.DT_ZIPCODE, PRDATATYPES.DT_MOBILEPHONE, PRDATATYPES.DT_PHONE, PRDATATYPES.DT_ADDRESS];
     }
 
     /**
@@ -1756,27 +2252,102 @@ function editDistance1(word) {
         return null;
     };
 
-     correction (value) {
+    testTyposErrors(value) {
+        var editDistance1Words = editDistance1(value);
 
-         var editDistance1Words = editDistance1(value);
+        var corrections = [];
+        var testCorrectionDatatypes = this.typosCheckingTypes;
 
-         var corrections = [];
-         var DATATYPES = [PRDATATYPES.DT_PROVINCE, PRDATATYPES.DT_MUNICIPALITY,
-             PRDATATYPES.DT_SURNAME, PRDATATYPES.DT_NAME];
+        for(var index in testCorrectionDatatypes){
+            corrections = corrections.concat(testCorrectionDatatypes[index].correct(editDistance1Words, value));
+        }
 
-         for(var i=0; i < editDistance1Words.length; i++){
-             // console.log(editDistance1Words[i])
-             for(var datatype_in_list in DATATYPES){
-                 var current_datatype = datatype_in_list.evaluate(editDistance1Words[i]);
-                 if(current_datatype.datatype!=PRDATATYPES.DT_UNKNOWN){
-                     corrections.push({ datatype: current_datatype.datatype, value: value, num_of_modifications:1, correction:editDistance1Words[i]});
-                 }
-             }
-         }
-         if(corrections.length==0){
-             correction.push({datatype: PRDATATYPES.DT_UNKNOWN, value: value });
-         }
-         return corrections;
-     };
+        return corrections;
+    };
+
+    testContentPrivacyBreaches(value){
+        var matchList = [];
+        var contentPrivacyBreachesDatatypes = this.contentPrivacyBreachesTypes;
+
+        for(var index in contentPrivacyBreachesDatatypes){
+            matchList = matchList.concat(contentPrivacyBreachesDatatypes[index].checkInText(value));
+        }
+
+        return matchList;
+    };
+
 
 };//EndClass.
+
+/*
+function(){
+    var txtFile = "";
+    var file = new File(["names"], txtFile);
+
+    var names_list = [];
+
+    var reader = new FileReader();
+    debugger
+    reader.onload = function(){
+        var text = reader.result;
+
+        var lines = text.split(/[\r\n]+/g); // tolerate both Windows and Unix linebreaks
+
+        lines.forEach(function(line) {
+            names_list.push(line);
+        });
+
+        return names_list;
+    };
+    reader.readAsText(file);
+};
+*/
+
+/*
+
+PRDATATYPES.DT_SURNAME.evaluate = function (value) {
+
+    value = value.toLowerCase();
+    value = value.trim();
+    var MAX_ACCETTABLE_DISTANCE = value.length/2;
+
+    //perfect match
+    if (value in most_popular_italian_surnames)
+        return { datatype: PRDATATYPES.DT_SURNAME, value: value };
+    //debugger
+    if (value in most_popular_italian_names)
+        return { datatype: PRDATATYPES.DT_NAME, value: value };
+
+    //similarity distance computed by levenshtein
+    var min_distance_surname = Levenshtein.get(value, most_popular_italian_surnames[Object.keys(most_popular_italian_surnames)[0]]);
+    var distance;
+    for (var key in most_popular_italian_surnames){
+        distance  = Levenshtein.get(value, key);
+        if(distance<min_distance_surname){
+            min_distance_surname = distance;
+        }
+    }
+
+    var min_distance_name = Levenshtein.get(value, most_popular_italian_names[Object.keys(most_popular_italian_names)[0]]);
+    for (var key in most_popular_italian_names){
+        distance  = Levenshtein.get(value, key);
+        if(distance<min_distance_name){
+            min_distance_name = distance;
+        }
+    }
+
+    if(min_distance_surname <=min_distance_name){
+        if(min_distance_surname <=MAX_ACCETTABLE_DISTANCE){
+            return { datatype: PRDATATYPES.DT_SURNAME, value: value };
+        }
+    }else{
+        if(min_distance_name <=MAX_ACCETTABLE_DISTANCE){
+            return { datatype: PRDATATYPES.DT_NAME, value: value };
+        }
+    }
+
+    return { datatype: PRDATATYPES.DT_UNKNOWN, value: value };
+};
+
+PRDATATYPES.DT_NAME.evaluate = PRDATATYPES.DT_SURNAME.evaluate;
+* */

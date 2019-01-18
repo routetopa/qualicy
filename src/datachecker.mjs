@@ -112,9 +112,66 @@ export class DataChecker {
         return evaLog;
     };//EndFunction.
 
-    testTyposErrors(value){
+    detectTyposErrorsCorrections(value) {
         return this._dataTypeConfigFactory.testTyposErrors(value);
     }
+
+    testTyposErrors(dataset, fieldKeys, options) {
+        let evaLog = []; //Stack with all the issues found in the dataset.
+        let annotateInputDataset = false;
+
+        //Manage the options.
+        if (typeof options !== "undefined") {
+            annotateInputDataset = (options.annotateInputDataset !== "undefined" && options.annotateInputDataset);
+        }
+
+        for (let irow=0; irow<dataset.length; irow++) {
+            let row = dataset[irow];
+
+            for (let ikey=0; ikey<fieldKeys.length; ikey++) {
+                let key = fieldKeys[ikey];
+
+                //Value to evaluate.
+                let fieldValue = row[key.name] + '';
+
+                //
+                //if (typeof value === 'undefined')
+                //   return  { datatype: PRDATATYPES.DT_UNKNOWN, value: value };
+
+                let _typosCorrections =  this.detectTyposErrorsCorrections(fieldValue);
+
+                if (_typosCorrections.length != 0 ) {
+                    //TODO manage description and internationalization
+
+                    //let _keydescr = "key_descr_" + _inferredType.datatype.name;
+                    //let descr = this._dataTypeConfigFactory.translate(_keydescr, "EN");
+                    let descr = "TYPOS ERROR: ";
+                    for(let correction_index = 0; correction_index < _typosCorrections.length; correction_index++){
+                        let correction = _typosCorrections[correction_index];
+                        descr += correction.correction;
+                    }
+
+                    let evaLogItem = {
+                        i: irow,
+                        j: ikey,
+                        key: key.name,
+                        value: fieldValue,
+                        datatype: "TYPOS ERROR",
+                        descr: descr
+                    };
+
+                    //The user accepted the annotation of the original dataset.
+                    if (annotateInputDataset) {
+                        row.__qualicy = evaLogItem;
+                    }
+
+                    evaLog.push(evaLogItem);
+                }
+
+            }
+        }
+        return evaLog;
+    };//EndFunction.
 
     testContentPrivacyBreaches(value){
         return this._dataTypeConfigFactory.testContentPrivacyBreaches(value);

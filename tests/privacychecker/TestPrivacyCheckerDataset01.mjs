@@ -27,15 +27,17 @@ function runTests(datum) {
 
         let viewBuilder = new PrivacyReportViewBuilder();
         let reportView = viewBuilder.build(evaLogs);
-        debugger
-        assert.ok(reportView.DATATYPES["EMAIL"].warnings == 145, "Checking of emails");
-        assert.ok(reportView.DATATYPES["ZIPCODE"].warnings == 57, "Checking of ZIP codes");
-        assert.ok(reportView.DATATYPES["MOBILE_PHONE"].warnings == 45, "Checking of mobile phones");
-        //assert.ok(reportView.DATATYPES["PHONE"].warnings == 16, "Checking of phone numbers");
-        assert.ok(reportView.DATATYPES["ADDRESS"].warnings == 56, "Checking of addresses");
-        //assert.ok(reportView.DATATYPES["SURNAME"].warnings < 57, "Checking of surnames"); //max_valuae = # of changes; max_value=1->10 surnames, max_value=2->90
-        assert.ok(reportView.DATATYPES["PROVINCE"].warnings == 70, "Checking of provinces");
-        assert.ok(reportView.DATATYPES["MUNICIPALITY"].warnings == 41, "Checking of municipalities"); //also one surname
+
+        console.log(evaLogs);
+        console.log(reportView);
+
+        assert.equal(reportView.DATATYPES["PROVINCE"].warnings, 70, "Checking of provinces");
+        assert.equal(reportView.DATATYPES["MUNICIPALITY"].warnings, 41, "Checking of municipalities"); //also one surname
+        assert.equal(reportView.DATATYPES["ADDRESS"].warnings, 56, "Checking of addresses");
+        assert.equal(reportView.DATATYPES["ZIPCODE"].warnings, 57, "Checking of ZIP codes");
+        assert.equal(reportView.DATATYPES["MOBILE_PHONE"].warnings, 45, "Checking of mobile phones");
+        assert.equal(reportView.DATATYPES["EMAIL"].warnings, 146, "Checking of emails");
+        assert.equal(reportView.DATATYPES["URL"].warnings , 29, "Checking of websites/URL");
 
         var surnames = [];
         var names = [];
@@ -49,11 +51,11 @@ function runTests(datum) {
             else if(elem.datatype.name=="MUNICIPALITY")
                 other.push(elem);
         }
-        console.log("surnames : " + reportView.DATATYPES["SURNAME"].warnings);
-        console.log(surnames);
-        console.log("names : " + reportView.DATATYPES["NAME"].warnings);
-        console.log(names);
-        console.log(other);
+        //console.log("surnames : " + reportView.DATATYPES["SURNAME"].warnings);
+        //console.log(surnames);
+        //console.log("names : " + reportView.DATATYPES["NAME"].warnings);
+        //console.log(names);
+        //console.log(other);
     });//EndFunction.
 
     QUnit.test("Test Report View Group by Row", function(assert) {

@@ -144,26 +144,61 @@ QUnit.test("Test Privacy Checker", function(assert) {
     inferredType = datachecker.inferDataTypeOfValue(value);
     assert.ok(inferredType.datatype === prConfigFactory.DATATYPES.DT_MUNICIPALITY, "Recognizing the value " + value);
 
+    //tests from https://www.istat.it/it/files/2011/03/TABELLA_DI_RACCORDO_ATECOFIN2004_ATECO2007.pdf
+    value = "84.13.30";
+    inferredType = datachecker.inferDataTypeOfValue(value);
+    assert.ok(inferredType.datatype === prConfigFactory.DATATYPES.DT_ATECO_CODE, "Recognizing the value " + value);
+    value = "09.10.00";
+    inferredType = datachecker.inferDataTypeOfValue(value);
+    assert.ok(inferredType.datatype === prConfigFactory.DATATYPES.DT_ATECO_CODE, "Recognizing the value " + value);
+    value = "18.24.3p";
+    inferredType = datachecker.inferDataTypeOfValue(value);
+    assert.ok(inferredType.datatype === prConfigFactory.DATATYPES.DT_ATECO_CODE, "Recognizing the value " + value);
+    value = "18.24.A";
+    inferredType = datachecker.inferDataTypeOfValue(value);
+    assert.ok(inferredType.datatype === prConfigFactory.DATATYPES.DT_ATECO_CODE, "Recognizing the value " + value);
+    value = "18.30.1";
+    inferredType = datachecker.inferDataTypeOfValue(value);
+    assert.ok(inferredType.datatype === prConfigFactory.DATATYPES.DT_ATECO_CODE, "Recognizing the value " + value);
+
+    value = "Salerno";
+    var corrections = datachecker.detectTyposErrorsCorrections(value);
+    console.log(corrections);
     value = "Salero";
-    var corrections = datachecker.testTyposErrors(value);
+    var corrections = datachecker.detectTyposErrorsCorrections(value);
     console.log(corrections);
-
     value = "Saleron";
-    corrections = datachecker.testTyposErrors(value);
+    corrections = datachecker.detectTyposErrorsCorrections(value);
     console.log(corrections);
-
     value = "Salernoo";
-    corrections = datachecker.testTyposErrors(value);
+    corrections = datachecker.detectTyposErrorsCorrections(value);
+    console.log(corrections);
+    value = "Salervo";
+    corrections = datachecker.detectTyposErrorsCorrections(value);
     console.log(corrections);
 
-    value = "Salervo";
-    corrections = datachecker.testTyposErrors(value);
+    value = "Giuliano in Campania";
+    corrections = datachecker.detectTyposErrorsCorrections(value);
+    console.log(corrections);
+    value = "Succivo";
+    corrections = datachecker.detectTyposErrorsCorrections(value);
+    console.log(corrections);
+    value = "Giffoni Valle Piana";
+    corrections = datachecker.detectTyposErrorsCorrections(value);
+    console.log(corrections);
+    value = "Orta di Atella";
+    corrections = datachecker.detectTyposErrorsCorrections(value);
+    console.log(corrections);
+    value = "San Martino Valle caudina";
+    corrections = datachecker.detectTyposErrorsCorrections(value);
+    console.log(corrections);
+    value = "Torrecuso";
+    corrections = datachecker.detectTyposErrorsCorrections(value);
     console.log(corrections);
 
     value = "Il mio CF è PPPPLT80R10M082K";
     var contentPrivacyBreaches = datachecker.testContentPrivacyBreaches(value);
     console.log(contentPrivacyBreaches);
-
     value = "Sono nato in via Genova n° 47, Salerno. Il mio IBAN è IT66C010050338 2000000218020 (349 12 34 567 per dettagli)";
     contentPrivacyBreaches = datachecker.testContentPrivacyBreaches(value);
     console.log(contentPrivacyBreaches);
