@@ -30,12 +30,10 @@ function runTests(datum) {
 
         assert.ok(reportView.DATATYPES["ADDRESS"].warnings == 92, "Checking of addresses");
         assert.ok(reportView.DATATYPES["MUNICIPALITY"].warnings == 89, "Checking of municipalities");
-        assert.ok(reportView.DATATYPES["ZIPCODE"].warnings == 198, "Checking of ZIP codes"); //anche codice istat comune
+        assert.ok(reportView.DATATYPES["ZIPCODE"].warnings == 198, "Checking of ZIP codes"); //also codice istat are recognised as municipalities
         assert.ok(reportView.DATATYPES["PROVINCE"].warnings == 109, "Checking of provinces");
         assert.ok(reportView.DATATYPES["REGION"].warnings == 99, "Checking of regions");
-        assert.ok(reportView.DATATYPES["LONGITUDE"].warnings == 99, "Checking of longitude"); //riconosce i codici istat provincia come longitudine
-        //assert.ok(reportView.DATATYPES["LATITUDE"].warnings == 99, "Checking of regions");
-        assert.ok(reportView.DATATYPES["PHONE"].warnings == 1, "Checking of provinces"); //gli altri sono scritti senza lo 0 iniziale
+        assert.ok(reportView.DATATYPES["PHONE"].warnings == 1, "Checking of provinces"); //others are wrongly written/parsed
         assert.ok(reportView.DATATYPES["URL"].warnings == 31, "Checking of websites/URL");
         assert.ok(reportView.DATATYPES["EMAIL"].warnings == 42, "Checking of emails");
 
